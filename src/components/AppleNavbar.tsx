@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Search, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import AppleStoreDropdown from './AppleStoreDropdown';
+import AppleMegaDropdown from './AppleMegaDropdown';
 
 // Styled Components
 const NavContainer = styled.nav`
@@ -159,11 +159,19 @@ const navLinks = [
 
 const AppleNavbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isStoreDropdownOpen, setIsStoreDropdownOpen] = useState(false);
+  const [dropdownMenuKey, setDropdownMenuKey] = useState<string | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Dropdown hover logic
-  const handleStoreMouseEnter = () => setIsStoreDropdownOpen(true);
-  const handleStoreMouseLeave = () => setIsStoreDropdownOpen(false);
+  const handleMenuMouseEnter = (key: string) => {
+    setDropdownMenuKey(key);
+    setIsDropdownOpen(true);
+  };
+  const handleMenuMouseLeave = () => {
+    setIsDropdownOpen(false);
+    // Don't reset key immediately to allow animation out
+    setTimeout(() => setDropdownMenuKey(null), 290);
+  };
 
   return (
     <>
@@ -175,22 +183,16 @@ const AppleNavbar: React.FC = () => {
 
           {/* Desktop Navigation */}
           <NavList>
-            {navLinks.map((link) =>
-              link.title === 'Store' ? (
-                <NavItem
-                  key={link.title}
-                  onMouseEnter={handleStoreMouseEnter}
-                  onMouseLeave={handleStoreMouseLeave}
-                  style={{ position: 'relative' }}
-                >
-                  <NavLink to={link.path}>{link.title}</NavLink>
-                </NavItem>
-              ) : (
-                <NavItem key={link.title}>
-                  <NavLink to={link.path}>{link.title}</NavLink>
-                </NavItem>
-              )
-            )}
+            {navLinks.map((link) => (
+              <NavItem
+                key={link.title}
+                onMouseEnter={() => handleMenuMouseEnter(link.title)}
+                onMouseLeave={handleMenuMouseLeave}
+                style={{ position: 'relative' }}
+              >
+                <NavLink to={link.path}>{link.title}</NavLink>
+              </NavItem>
+            ))}
           </NavList>
 
           <IconContainer>
@@ -219,8 +221,11 @@ const AppleNavbar: React.FC = () => {
         </MobileMenu>
       </NavContainer>
 
-      {/* Outside nav for full-width dropdown and animation */}
-      <AppleStoreDropdown visible={isStoreDropdownOpen} />
+      {/* Full-width mega dropdown - overlays page */}
+      <AppleMegaDropdown
+        visible={isDropdownOpen}
+        menuKey={dropdownMenuKey}
+      />
     </>
   );
 };
