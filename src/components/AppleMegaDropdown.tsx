@@ -163,11 +163,18 @@ const DropdownAnim = styled.div<{ visible: boolean }>`
   display: flex;
   justify-content: center;
   overflow: hidden;
-  opacity: ${({ visible }) => (visible ? "1" : "0")};
   max-height: ${({ visible }) => (visible ? "600px" : "0")};
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   visibility: ${({ visible }) => (visible ? "visible" : "hidden")};
   padding: ${({ visible }) => (visible ? "42px 0 52px 0" : "0")};
+`;
+
+const ContentWrapper = styled.div<{ visible: boolean }>`
+  opacity: ${({ visible }) => (visible ? "1" : "0")};
+  transform: translateY(${({ visible }) => (visible ? "0" : "-10px")});
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition-delay: ${({ visible }) => (visible ? "0.1s" : "0s")};
+  width: 100%;
 `;
 
 const MegaMenu = styled.div`
@@ -231,20 +238,22 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
 
   return (
     <DropdownAnim visible={visible} aria-hidden={!visible}>
-      <MegaMenu>
-        {dropdown.sections.map((section: any, sectionIdx: number) => (
-          <Col key={sectionIdx}>
-            <SectionTitle>{section.title}</SectionTitle>
-            {section.items.map((item: any, idx: number) =>
-              idx < 2 && sectionIdx === 0 ? (
-                <SectionLink key={item.label} to={item.path}>{item.label}</SectionLink>
-              ) : (
-                <RegularLink key={item.label} to={item.path}>{item.label}</RegularLink>
-              )
-            )}
-          </Col>
-        ))}
-      </MegaMenu>
+      <ContentWrapper visible={visible}>
+        <MegaMenu>
+          {dropdown.sections.map((section: any, sectionIdx: number) => (
+            <Col key={sectionIdx}>
+              <SectionTitle>{section.title}</SectionTitle>
+              {section.items.map((item: any, idx: number) =>
+                idx < 2 && sectionIdx === 0 ? (
+                  <SectionLink key={item.label} to={item.path}>{item.label}</SectionLink>
+                ) : (
+                  <RegularLink key={item.label} to={item.path}>{item.label}</RegularLink>
+                )
+              )}
+            </Col>
+          ))}
+        </MegaMenu>
+      </ContentWrapper>
     </DropdownAnim>
   );
 };
