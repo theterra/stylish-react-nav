@@ -373,14 +373,16 @@ const AppleNavbar: React.FC = () => {
           transition: 'opacity 0.3s cubic-bezier(.4,0,.2,1), transform 0.33s cubic-bezier(.4,0,.2,1)'
         }}
       >
-        <button
-          className="absolute top-7 right-7 z-10"
-          aria-label="Close Menu"
-          style={{ WebkitTapHighlightColor: 'transparent' }}
-          onClick={() => setIsMobileMenuOpen(false)}
-        >
-          <X size={34} className="text-zinc-200" />
-        </button>
+        {!activeMobileMenu && (
+          <button
+            className="absolute top-7 right-7 z-10"
+            aria-label="Close Menu"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <X size={34} className="text-zinc-200" />
+          </button>
+        )}
         
         {!activeMobileMenu && (
           <ScrollArea className="w-full h-full px-8 py-10">
@@ -414,7 +416,7 @@ const AppleNavbar: React.FC = () => {
             items={activeMobileMenu ? mobileSubmenus[activeMobileMenu] : []}
             onClose={() => setIsMobileMenuOpen(false)}
             onBack={() => setActiveMobileMenu(null)}
-            hideCloseButton={true}
+            hideCloseButton={false}  // Show both Back and Close buttons inside submenu
           />
         )}
       </div>
