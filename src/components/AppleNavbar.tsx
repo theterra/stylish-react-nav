@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Search, ShoppingBag, Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AppleMegaDropdown from './AppleMegaDropdown';
+import { ScrollArea } from './ui/scroll-area';
 
 // Styled Components
 const NavContainer = styled.nav`
@@ -297,26 +298,29 @@ const AppleNavbar: React.FC = () => {
         >
           <X size={34} className="text-zinc-200" />
         </button>
-        {/* Menu List */}
-        <nav className="flex flex-col items-start justify-center w-full h-full px-8 select-none">
-          <ul className="w-full flex flex-col gap-3">
-            {navLinks.map((link) => (
-              <li key={link.title}>
-                <Link
-                  to={link.path}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-zinc-100 font-normal text-[2.1rem] leading-tight tracking-tight block py-[0.15em] px-2 hover:opacity-85 transition-opacity"
-                  style={{
-                    fontWeight: 400,
-                    letterSpacing: '-0.011em'
-                  }}
-                >
-                  {link.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        
+        {/* Menu List with ScrollArea */}
+        <ScrollArea className="w-full h-full px-8 py-10">
+          <nav className="flex flex-col items-start justify-center w-full select-none">
+            <ul className="w-full flex flex-col gap-3">
+              {navLinks.map((link) => (
+                <li key={link.title}>
+                  <Link
+                    to={link.path}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-zinc-100 font-normal text-[2.1rem] leading-tight tracking-tight block py-[0.15em] px-2 hover:opacity-85 transition-opacity"
+                    style={{
+                      fontWeight: 400,
+                      letterSpacing: '-0.011em'
+                    }}
+                  >
+                    {link.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </ScrollArea>
       </div>
 
       {/* DESKTOP: Navigation bar */}
