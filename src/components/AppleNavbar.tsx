@@ -4,6 +4,7 @@ import { Search, ShoppingBag, Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AppleMegaDropdown from './AppleMegaDropdown';
 import { ScrollArea } from './ui/scroll-area';
+import MobileMenuSubpanel from "./MobileMenuSubpanel";
 
 // Styled Components
 const NavContainer = styled.nav`
@@ -198,10 +199,87 @@ const navLinks = [
   { title: 'Support', path: '/support' },
 ];
 
+const mobileSubmenus: Record<string, Array<{ label: string; path?: string }>> = {
+  Store: [
+    { label: "Shop the Latest", path: "/store/shop-latest" },
+    { label: "Quick Links", path: "#" },
+    { label: "Find a Store", path: "/find-a-store" },
+    { label: "Order Status", path: "/order-status" },
+    { label: "Apple Trade In", path: "/trade-in" },
+    { label: "Financing", path: "/financing" },
+    { label: "Personal Setup", path: "/personal-setup" },
+  ],
+  Mac: [
+    { label: "MacBook Air", path: "/mac/macbook-air" },
+    { label: "MacBook Pro", path: "/mac/macbook-pro" },
+    { label: "iMac", path: "/mac/imac" },
+    { label: "Mac mini", path: "/mac/mac-mini" },
+    { label: "Compare all Mac", path: "/mac/compare" },
+  ],
+  iPad: [
+    { label: "iPad Pro", path: "/ipad/pro" },
+    { label: "iPad Air", path: "/ipad/air" },
+    { label: "iPad", path: "/ipad" },
+    { label: "iPad mini", path: "/ipad/mini" },
+    { label: "Compare all iPad", path: "/ipad/compare" },
+  ],
+  iPhone: [
+    { label: "iPhone 15 Pro", path: "/iphone/15-pro" },
+    { label: "iPhone 15", path: "/iphone/15" },
+    { label: "iPhone SE", path: "/iphone/se" },
+    { label: "Compare all iPhone", path: "/iphone/compare" },
+  ],
+  Watch: [
+    { label: "Apple Watch Series 9", path: "/watch/series-9" },
+    { label: "Apple Watch SE", path: "/watch/se" },
+    { label: "Apple Watch Ultra 2", path: "/watch/ultra-2" },
+    { label: "Compare all Watches", path: "/watch/compare" },
+  ],
+  Vision: [
+    { label: "Apple Vision Pro", path: "/vision/pro" },
+    { label: "Apps & Experiences", path: "/vision/apps" },
+    { label: "Tech Specs", path: "/vision/specs" },
+  ],
+  AirPods: [
+    { label: "AirPods Pro (2nd gen)", path: "/airpods/pro" },
+    { label: "AirPods (3rd gen)", path: "/airpods/3" },
+    { label: "AirPods Max", path: "/airpods/max" },
+    { label: "Compare all AirPods", path: "/airpods/compare" },
+  ],
+  "TV & Home": [
+    { label: "Apple TV 4K", path: "/tv-home/tv4k" },
+    { label: "HomePod", path: "/tv-home/homepod" },
+    { label: "HomePod mini", path: "/tv-home/homepod-mini" },
+    { label: "Apple TV+ Streaming", path: "/tv-home/tvplus" },
+  ],
+  Entertainment: [
+    { label: "Apple TV+", path: "/entertainment/tvplus" },
+    { label: "Apple Music", path: "/entertainment/music" },
+    { label: "Apple Arcade", path: "/entertainment/arcade" },
+    { label: "Apple Fitness+", path: "/entertainment/fitness" },
+  ],
+  Accessories: [
+    { label: "Shop All Accessories", path: "/accessories/all" },
+    { label: "Mac Accessories", path: "/accessories/mac" },
+    { label: "iPad Accessories", path: "/accessories/ipad" },
+    { label: "iPhone Accessories", path: "/accessories/iphone" },
+    { label: "Watch Accessories", path: "/accessories/watch" },
+  ],
+  Support: [
+    { label: "iPhone Support", path: "/support/iphone" },
+    { label: "Mac Support", path: "/support/mac" },
+    { label: "iPad Support", path: "/support/ipad" },
+    { label: "Watch Support", path: "/support/watch" },
+    { label: "Contact Support", path: "/support/contact" },
+  ],
+};
+
 const AppleNavbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [dropdownMenuKey, setDropdownMenuKey] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [mobileSubpanelOpen, setMobileSubpanelOpen] = React.useState(false);
+  const [activeMobileMenu, setActiveMobileMenu] = React.useState<string | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<number | null>(null);
   const mouseLeaveTimeoutRef = useRef<number | null>(null);
@@ -257,6 +335,11 @@ const AppleNavbar: React.FC = () => {
     };
   }, [isMobileMenuOpen]);
 
+  const handleMobileNavClick = (menuKey: string) => {
+    setActiveMobileMenu(menuKey);
+    setMobileSubpanelOpen(true);
+  };
+
   return (
     <div ref={navRef} style={{ width: '100vw' }}>
       {/* MOBILE: Navigation bar */}
@@ -277,15 +360,17 @@ const AppleNavbar: React.FC = () => {
         </button>
       </div>
 
-      {/* MOBILE: Fullscreen Overlay Menu */}
+      {/* MOBILE: Main menu overlay (shows only if submenu isn't open) */}
       <div
         className={`
           fixed top-0 left-0 z-[99999] w-screen h-screen bg-[#18181b] transition-all duration-300
-          ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto scale-100' : 'opacity-0 pointer-events-none scale-98'}
+          ${isMobileMenuOpen && !mobileSubpanelOpen
+            ? 'opacity-100 pointer-events-auto scale-100'
+            : 'opacity-0 pointer-events-none scale-98'}
           flex md:hidden
         `}
         style={{
-          backdropFilter: isMobileMenuOpen ? "blur(2px)" : undefined,
+          backdropFilter: isMobileMenuOpen && !mobileSubpanelOpen ? "blur(2px)" : undefined,
           transition: 'opacity 0.3s cubic-bezier(.4,0,.2,1), transform 0.33s cubic-bezier(.4,0,.2,1)'
         }}
       >
@@ -299,29 +384,43 @@ const AppleNavbar: React.FC = () => {
           <X size={34} className="text-zinc-200" />
         </button>
         
-        {/* Menu List with ScrollArea */}
+        {/* Scrollable Menu List */}
         <ScrollArea className="w-full h-full px-8 py-10">
           <nav className="flex flex-col items-start justify-center w-full select-none">
             <ul className="w-full flex flex-col gap-3">
               {navLinks.map((link) => (
                 <li key={link.title}>
-                  <Link
-                    to={link.path}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-zinc-100 font-normal text-[2.1rem] leading-tight tracking-tight block py-[0.15em] px-2 hover:opacity-85 transition-opacity"
+                  <button
+                    type="button"
+                    className="text-zinc-100 font-normal text-[2.1rem] leading-tight tracking-tight block py-[0.15em] px-2 hover:opacity-85 transition-opacity w-full text-left"
                     style={{
                       fontWeight: 400,
-                      letterSpacing: '-0.011em'
+                      letterSpacing: '-0.011em',
+                      wordBreak: "break-word"
                     }}
+                    onClick={() => handleMobileNavClick(link.title)}
                   >
                     {link.title}
-                  </Link>
+                  </button>
                 </li>
               ))}
             </ul>
           </nav>
         </ScrollArea>
       </div>
+
+      {/* MOBILE: Subpanel overlay (sub-menu items for each main menu) */}
+      <MobileMenuSubpanel
+        open={!!mobileSubpanelOpen}
+        menuLabel={activeMobileMenu ?? ""}
+        items={activeMobileMenu ? (mobileSubmenus[activeMobileMenu] || [{ label: "No data" }]) : []}
+        onClose={() => {
+          setMobileSubpanelOpen(false);
+          setIsMobileMenuOpen(false);
+          setTimeout(() => setActiveMobileMenu(null), 300);
+        }}
+        onBack={() => setMobileSubpanelOpen(false)}
+      />
 
       {/* DESKTOP: Navigation bar */}
       <NavContainer>
