@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Search, ShoppingBag } from 'lucide-react';
@@ -202,11 +201,8 @@ const AppleNavbar: React.FC = () => {
     // Add a small delay before closing to prevent accidental closings
     mouseLeaveTimeoutRef.current = window.setTimeout(() => {
       // First change content visibility
-      timeoutRef.current = window.setTimeout(() => {
-        // Then fully close the dropdown after content has faded
-        setIsDropdownOpen(false);
-      }, 300);
-    }, 200);
+      setIsDropdownOpen(false);
+    }, 250);
   };
 
   // Cleanup timeouts on unmount
