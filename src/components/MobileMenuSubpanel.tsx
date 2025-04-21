@@ -22,17 +22,14 @@ const MobileMenuSubpanel: React.FC<MobileMenuSubpanelProps> = ({
   onClose,
   onBack,
 }) => {
-  // Slide-in/out using translate-x CSS and fade for overlay
+  // Fade in/out animation instead of slide
   return (
     <div
       className={`
         fixed inset-0 z-[100000] bg-[#18181b] transition-all duration-300 
-        ${open ? "opacity-100 pointer-events-auto translate-x-0" : "opacity-0 pointer-events-none translate-x-full"}
+        ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
         flex flex-col
       `}
-      style={{
-        backdropFilter: open ? "blur(2px)" : undefined,
-      }}
       aria-hidden={!open}
     >
       {/* Header row with back/close */}

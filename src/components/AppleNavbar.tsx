@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { Search, ShoppingBag, Menu, X } from 'lucide-react';
+import { Search, ShoppingBag, Menu, X, ChevronLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AppleMegaDropdown from './AppleMegaDropdown';
 import { ScrollArea } from './ui/scroll-area';
@@ -278,7 +278,6 @@ const AppleNavbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [dropdownMenuKey, setDropdownMenuKey] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [mobileSubpanelOpen, setMobileSubpanelOpen] = React.useState(false);
   const [activeMobileMenu, setActiveMobileMenu] = React.useState<string | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<number | null>(null);
@@ -337,7 +336,6 @@ const AppleNavbar: React.FC = () => {
 
   const handleMobileNavClick = (menuKey: string) => {
     setActiveMobileMenu(menuKey);
-    setMobileSubpanelOpen(true);
   };
 
   return (
@@ -352,7 +350,12 @@ const AppleNavbar: React.FC = () => {
         <button
           aria-label={isMobileMenuOpen ? "Close Menu" : "Open Menu"}
           className="rounded focus:outline-none"
-          onClick={() => setIsMobileMenuOpen(o => !o)}
+          onClick={() => {
+            setIsMobileMenuOpen(o => !o);
+            if (!isMobileMenuOpen) {
+              setActiveMobileMenu(null); // Reset active menu when opening
+            }
+          }}
         >
           {isMobileMenuOpen
             ? <X size={28} className="text-zinc-200" />
@@ -360,17 +363,17 @@ const AppleNavbar: React.FC = () => {
         </button>
       </div>
 
-      {/* MOBILE: Main menu overlay (shows only if submenu isn't open) */}
+      {/* MOBILE: Menu overlay */}
       <div
         className={`
           fixed top-0 left-0 z-[99999] w-screen h-screen bg-[#18181b] transition-all duration-300
-          ${isMobileMenuOpen && !mobileSubpanelOpen
+          ${isMobileMenuOpen 
             ? 'opacity-100 pointer-events-auto scale-100'
             : 'opacity-0 pointer-events-none scale-98'}
           flex md:hidden
         `}
         style={{
-          backdropFilter: isMobileMenuOpen && !mobileSubpanelOpen ? "blur(2px)" : undefined,
+          backdropFilter: isMobileMenuOpen ? "blur(2px)" : undefined,
           transition: 'opacity 0.3s cubic-bezier(.4,0,.2,1), transform 0.33s cubic-bezier(.4,0,.2,1)'
         }}
       >
@@ -384,43 +387,64 @@ const AppleNavbar: React.FC = () => {
           <X size={34} className="text-zinc-200" />
         </button>
         
-        {/* Scrollable Menu List */}
-        <ScrollArea className="w-full h-full px-8 py-10">
-          <nav className="flex flex-col items-start justify-center w-full select-none">
-            <ul className="w-full flex flex-col gap-3">
-              {navLinks.map((link) => (
-                <li key={link.title}>
-                  <button
-                    type="button"
-                    className="text-zinc-100 font-normal text-[2.1rem] leading-tight tracking-tight block py-[0.15em] px-2 hover:opacity-85 transition-opacity w-full text-left"
-                    style={{
-                      fontWeight: 400,
-                      letterSpacing: '-0.011em',
-                      wordBreak: "break-word"
-                    }}
-                    onClick={() => handleMobileNavClick(link.title)}
-                  >
-                    {link.title}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </ScrollArea>
-      </div>
+        {/* Main Menu (visible when no submenu is active) */}
+        {!activeMobileMenu && (
+          <ScrollArea className="w-full h-full px-8 py-10">
+            <nav className="flex flex-col items-start justify-center w-full select-none">
+              <ul className="w-full flex flex-col gap-3">
+                {navLinks.map((link) => (
+                  <li key={link.title}>
+                    <button
+                      type="button"
+                      className="text-zinc-100 font-normal text-[2.1rem] leading-tight tracking-tight block py-[0.15em] px-2 hover:opacity-85 transition-opacity w-full text-left"
+                      style={{
+                        fontWeight: 400,
+                        letterSpacing: '-0.011em',
+                        wordBreak: "break-word"
+                      }}
+                      onClick={() => handleMobileNavClick(link.title)}
+                    >
+                      {link.title}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </ScrollArea>
+        )}
 
-      {/* MOBILE: Subpanel overlay (sub-menu items for each main menu) */}
-      <MobileMenuSubpanel
-        open={!!mobileSubpanelOpen}
-        menuLabel={activeMobileMenu ?? ""}
-        items={activeMobileMenu ? (mobileSubmenus[activeMobileMenu] || [{ label: "No data" }]) : []}
-        onClose={() => {
-          setMobileSubpanelOpen(false);
-          setIsMobileMenuOpen(false);
-          setTimeout(() => setActiveMobileMenu(null), 300);
-        }}
-        onBack={() => setMobileSubpanelOpen(false)}
-      />
+        {/* Submenu (renders in the same container as main menu) */}
+        {activeMobileMenu && (
+          <div className="w-full h-full">
+            <div className="flex items-center justify-between px-6 pt-7 pb-5">
+              <button aria-label="Back" onClick={() => setActiveMobileMenu(null)}>
+                <ChevronLeft size={32} className="text-zinc-300" />
+              </button>
+              <span className="text-lg font-medium text-zinc-200 truncate flex-1 text-center">
+                {activeMobileMenu}
+              </span>
+              <button aria-label="Close menu" onClick={() => setIsMobileMenuOpen(false)}>
+                <X size={28} className="text-zinc-200" />
+              </button>
+            </div>
+            <ScrollArea className="w-full h-[calc(100%-70px)] px-4 pb-5">
+              <ul className="flex flex-col gap-3">
+                {activeMobileMenu && mobileSubmenus[activeMobileMenu]?.map((item) => (
+                  <li key={item.label}>
+                    <a
+                      href={item.path || "#"}
+                      className="block text-2xl md:text-3xl font-medium text-white py-2 px-2 rounded hover:bg-zinc-800 transition-colors"
+                      style={{ wordBreak: "break-word" }}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </ScrollArea>
+          </div>
+        )}
+      </div>
 
       {/* DESKTOP: Navigation bar */}
       <NavContainer>
