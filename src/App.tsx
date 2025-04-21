@@ -16,6 +16,17 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/store" element={<Index />} />
+          <Route path="/mac" element={<Index />} />
+          <Route path="/ipad" element={<Index />} />
+          <Route path="/iphone" element={<Index />} />
+          <Route path="/watch" element={<Index />} />
+          <Route path="/vision" element={<Index />} />
+          <Route path="/airpods" element={<Index />} />
+          <Route path="/tv-home" element={<Index />} />
+          <Route path="/entertainment" element={<Index />} />
+          <Route path="/accessories" element={<Index />} />
+          <Route path="/support" element={<Index />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

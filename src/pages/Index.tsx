@@ -1,13 +1,29 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React from 'react';
+import AppleNavbar from '@/components/AppleNavbar';
+import MacbookHero from '@/components/MacbookHero';
+import styled from 'styled-components';
+
+const PageContainer = styled.div`
+  min-height: 100vh;
+  background-color: #000;
+  color: white;
+`;
+
+const AirSection = styled.section`
+  background-color: #f5f5f7;
+  width: 100%;
+`;
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <PageContainer>
+      <AppleNavbar />
+      <MacbookHero variant="pro" />
+      <AirSection>
+        <MacbookHero variant="air" />
+      </AirSection>
+    </PageContainer>
   );
 };
 
