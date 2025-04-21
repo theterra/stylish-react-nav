@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
@@ -150,11 +150,13 @@ const DummyDropdownData: Record<string, any> = {
   },
 };
 
+// Animation: collapse height, fade content for smooth open/close
 const DropdownAnim = styled.div<{ visible: boolean }>`
   position: fixed;
   left: 0;
   top: 44px;
   width: 100vw;
+  max-width: 100vw;
   background: #19191a;
   color: #fff;
   z-index: 1050;
@@ -162,32 +164,50 @@ const DropdownAnim = styled.div<{ visible: boolean }>`
   display: flex;
   justify-content: center;
   overflow: hidden;
-  max-height: ${({ visible }) => (visible ? "auto" : "0")};
+  /* Height transition */
+  max-height: ${({ visible }) => (visible ? "550px" : "0")};
   transition: max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   visibility: ${({ visible }) => (visible ? "visible" : "hidden")};
   padding: ${({ visible }) => (visible ? "42px 0 52px 0" : "0")};
+
+  @media (max-width: 1080px) {
+    max-width: 100vw;
+    padding-left: 0;
+    padding-right: 0;
+  }
 `;
 
 const ContentWrapper = styled.div<{ visible: boolean }>`
   opacity: ${({ visible }) => (visible ? "1" : "0")};
   transform: translateY(${({ visible }) => (visible ? "0" : "-10px")});
-  transition: opacity 0.35s ease, transform 0.4s ease;
-  transition-delay: ${({ visible }) => (visible ? "0.1s" : "0s")};
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
+  transition: opacity 0.33s cubic-bezier(0.4, 0, 0.2, 1), transform 0.33s cubic-bezier(0.4, 0, 0.2, 1);
+  transition-delay: ${({ visible }) => (visible ? "0.08s" : "0s")};
+  width: 100vw;
+  max-width: 1024px;
+  overflow-x: auto;
+  overflow-y: visible;
+  display: flex;
+  justify-content: center;
 `;
 
 const MegaMenu = styled.div`
+  background: none;
   width: 100%;
   max-width: 1024px;
   display: grid;
   grid-template-columns: 1.2fr 1fr 1fr;
   gap: 70px;
   margin: 0 auto;
-  
+
   @media (max-width: 1080px) {
-    padding: 0 20px;
+    padding: 0 10px;
+    gap: 30px;
+    max-width: 100vw;
+  }
+
+  @media (max-width: 850px) {
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 `;
 
@@ -195,6 +215,12 @@ const Col = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 170px;
+  max-width: 300px;
+  word-break: break-word;
+  @media (max-width: 850px) {
+    max-width: 98vw;
+  }
 `;
 
 const SectionTitle = styled.div`
@@ -232,34 +258,46 @@ const RegularLink = styled(Link)`
   }
 `;
 
-export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
+export const AppleMegaDropdown: React.FC<{ menuKey: string | null, visible: boolean }> = ({
   menuKey,
   visible,
 }) => {
+  // Unmount content after close for accessibility and layout
+  const [shouldRender, setShouldRender] = useState(visible);
+
+  useEffect(() => {
+    if (visible) setShouldRender(true);
+    else {
+      const timeout = setTimeout(() => setShouldRender(false), 430); // match closing transition
+      return () => clearTimeout(timeout);
+    }
+  }, [visible]);
+
   if (!menuKey || !(menuKey in DummyDropdownData)) return (
     <DropdownAnim visible={false} aria-hidden />
   );
 
   const dropdown = DummyDropdownData[menuKey];
-
   return (
     <DropdownAnim visible={visible} aria-hidden={!visible}>
-      <ContentWrapper visible={visible}>
-        <MegaMenu>
-          {dropdown.sections.map((section: any, sectionIdx: number) => (
-            <Col key={sectionIdx}>
-              <SectionTitle>{section.title}</SectionTitle>
-              {section.items.map((item: any, idx: number) =>
-                idx < 2 && sectionIdx === 0 ? (
-                  <SectionLink key={item.label} to={item.path}>{item.label}</SectionLink>
-                ) : (
-                  <RegularLink key={item.label} to={item.path}>{item.label}</RegularLink>
-                )
-              )}
-            </Col>
-          ))}
-        </MegaMenu>
-      </ContentWrapper>
+      {shouldRender &&
+        <ContentWrapper visible={visible}>
+          <MegaMenu>
+            {dropdown.sections.map((section: any, sectionIdx: number) => (
+              <Col key={sectionIdx}>
+                <SectionTitle>{section.title}</SectionTitle>
+                {section.items.map((item: any, idx: number) =>
+                  idx < 2 && sectionIdx === 0 ? (
+                    <SectionLink key={item.label} to={item.path}>{item.label}</SectionLink>
+                  ) : (
+                    <RegularLink key={item.label} to={item.path}>{item.label}</RegularLink>
+                  )
+                )}
+              </Col>
+            ))}
+          </MegaMenu>
+        </ContentWrapper>
+      }
     </DropdownAnim>
   );
 };
