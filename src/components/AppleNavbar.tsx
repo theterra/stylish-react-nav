@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Search, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import AppleStoreDropdown from './AppleStoreDropdown';
 
 // Styled Components
 const NavContainer = styled.nav`
@@ -159,6 +159,7 @@ const navLinks = [
 
 const AppleNavbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isStoreDropdownOpen, setIsStoreDropdownOpen] = useState(false);
 
   return (
     <NavContainer>
@@ -169,11 +170,37 @@ const AppleNavbar: React.FC = () => {
 
         {/* Desktop Navigation */}
         <NavList>
-          {navLinks.map((link) => (
-            <NavItem key={link.title}>
-              <NavLink to={link.path}>{link.title}</NavLink>
-            </NavItem>
-          ))}
+          {navLinks.map((link) =>
+            link.title === 'Store' ? (
+              <NavItem
+                key={link.title}
+                onMouseEnter={() => setIsStoreDropdownOpen(true)}
+                onMouseLeave={() => setIsStoreDropdownOpen(false)}
+                style={{ position: 'relative' }}
+              >
+                <NavLink to={link.path}>{link.title}</NavLink>
+                {isStoreDropdownOpen && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      top: "100%",
+                      width: "100vw",
+                      zIndex: 1000,
+                    }}
+                    onMouseEnter={() => setIsStoreDropdownOpen(true)}
+                    onMouseLeave={() => setIsStoreDropdownOpen(false)}
+                  >
+                    <AppleStoreDropdown />
+                  </div>
+                )}
+              </NavItem>
+            ) : (
+              <NavItem key={link.title}>
+                <NavLink to={link.path}>{link.title}</NavLink>
+              </NavItem>
+            )
+          )}
         </NavList>
 
         <IconContainer>
