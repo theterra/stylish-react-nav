@@ -27,6 +27,10 @@ const SubpanelContainer = styled.div<{ open: boolean }>`
   pointer-events: ${({ open }) => (open ? "auto" : "none")};
   display: flex;
   flex-direction: column;
+  
+  @media (min-width: 769px) {
+    display: none;
+  }
 `;
 
 const HeaderRow = styled.div`

@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import MobileMenuSubpanel from "./MobileMenuSubpanel";
 import AppleMegaDropdown from './AppleMegaDropdown';
 import { ScrollArea } from './ui/scroll-area';
+import { useIsMobile } from '../hooks/use-mobile';
 
 type NavLink = { title: string; path: string };
 
@@ -141,19 +142,24 @@ const MobileMenuDrawer = styled.div<{ open: boolean }>`
   pointer-events: ${({ open }) => open ? 'auto' : 'none'};
   transform: ${({ open }) => open ? 'scale(1)' : 'scale(0.98)'};
   backdrop-filter: ${({ open }) => open ? "blur(2px)" : "none"};
+  
   @media (min-width: 769px) {
     display: none;
   }
 `;
 
 const MobileHeader = styled.div`
-  display: flex;
-  width: 100vw;
-  align-items: center;
-  justify-content: space-between;
-  height: 48px;
-  padding: 0 8px 0 2px;
-  background: #000;
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: flex;
+    width: 100vw;
+    align-items: center;
+    justify-content: space-between;
+    height: 48px;
+    padding: 0 8px 0 2px;
+    background: #000;
+  }
 `;
 
 const ScrollAreaWrapper = styled.div`
@@ -203,6 +209,14 @@ const MobileMenuCloseBtn = styled.button`
   color: #aaa;
 `;
 
+const MobileIconButton = styled(IconButton)`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: flex;
+  }
+`;
+
 const NavigationModule: React.FC<NavigationModuleProps> = ({
   navLinks,
   mobileSubmenus
@@ -214,6 +228,7 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
   const navRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<number | null>(null);
   const mouseLeaveTimeoutRef = useRef<number | null>(null);
+  const isMobile = useIsMobile();
 
   const handleMenuMouseEnter = (key: string) => {
     if (timeoutRef.current !== null) {
@@ -269,13 +284,13 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
   };
 
   return (
-    <div ref={navRef} style={{ width: '100vw' }} onMouseLeave={handleNavMouseLeave}>
-      {/* Mobile header */}
+    <div ref={navRef} style={{ width: '100%' }} onMouseLeave={handleNavMouseLeave}>
+      {/* Mobile header - Only visible on mobile */}
       <MobileHeader>
         <LogoLink to="/">
           <AppleIcon />
         </LogoLink>
-        <IconButton
+        <MobileIconButton
           aria-label={isMobileMenuOpen ? "Close Menu" : "Open Menu"}
           onClick={() => {
             setIsMobileMenuOpen((o) => !o);
@@ -287,10 +302,10 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
           {isMobileMenuOpen
             ? <X size={28} style={{ color: "#F5F5F7" }} />
             : <Menu size={28} style={{ color: "#F5F5F7" }} />}
-        </IconButton>
+        </MobileIconButton>
       </MobileHeader>
 
-      {/* Mobile Menu Drawer */}
+      {/* Mobile Menu Drawer - Only visible on mobile */}
       <MobileMenuDrawer open={isMobileMenuOpen}>
         {!activeMobileMenu && (
           <>
