@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
@@ -151,7 +152,7 @@ const DummyDropdownData: Record<string, any> = {
 };
 
 // Animation: collapse height, fade content for smooth open/close
-const DropdownAnim = styled.div<{ visible: boolean }>`
+const DropdownAnim = styled.div<{ $visible: boolean }>`
   position: fixed;
   left: 0;
   top: 44px;
@@ -165,10 +166,10 @@ const DropdownAnim = styled.div<{ visible: boolean }>`
   justify-content: center;
   overflow: hidden;
   /* Height transition */
-  max-height: ${({ visible }) => (visible ? "550px" : "0")};
+  max-height: ${({ $visible }) => ($visible ? "550px" : "0")};
   transition: max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-  visibility: ${({ visible }) => (visible ? "visible" : "hidden")};
-  padding: ${({ visible }) => (visible ? "42px 0 52px 0" : "0")};
+  visibility: ${({ $visible }) => ($visible ? "visible" : "hidden")};
+  padding: ${({ $visible }) => ($visible ? "42px 0 52px 0" : "0")};
 
   @media (max-width: 1080px) {
     max-width: 100vw;
@@ -177,11 +178,11 @@ const DropdownAnim = styled.div<{ visible: boolean }>`
   }
 `;
 
-const ContentWrapper = styled.div<{ visible: boolean }>`
-  opacity: ${({ visible }) => (visible ? "1" : "0")};
-  transform: translateY(${({ visible }) => (visible ? "0" : "-10px")});
+const ContentWrapper = styled.div<{ $visible: boolean }>`
+  opacity: ${({ $visible }) => ($visible ? "1" : "0")};
+  transform: translateY(${({ $visible }) => ($visible ? "0" : "-10px")});
   transition: opacity 0.33s cubic-bezier(0.4, 0, 0.2, 1), transform 0.33s cubic-bezier(0.4, 0, 0.2, 1);
-  transition-delay: ${({ visible }) => (visible ? "0.08s" : "0s")};
+  transition-delay: ${({ $visible }) => ($visible ? "0.08s" : "0s")};
   width: 100vw;
   max-width: 1024px;
   overflow-x: auto;
@@ -274,14 +275,14 @@ export const AppleMegaDropdown: React.FC<{ menuKey: string | null, visible: bool
   }, [visible]);
 
   if (!menuKey || !(menuKey in DummyDropdownData)) return (
-    <DropdownAnim visible={false} aria-hidden />
+    <DropdownAnim $visible={false} aria-hidden="true" />
   );
 
   const dropdown = DummyDropdownData[menuKey];
   return (
-    <DropdownAnim visible={visible} aria-hidden={!visible}>
+    <DropdownAnim $visible={visible} aria-hidden={!visible ? "true" : "false"}>
       {shouldRender &&
-        <ContentWrapper visible={visible}>
+        <ContentWrapper $visible={visible}>
           <MegaMenu>
             {dropdown.sections.map((section: any, sectionIdx: number) => (
               <Col key={sectionIdx}>

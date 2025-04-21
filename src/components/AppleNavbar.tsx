@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Search, ShoppingBag, Menu, X, ChevronLeft } from 'lucide-react';
@@ -296,6 +297,13 @@ const AppleNavbar: React.FC = () => {
     setIsDropdownOpen(true);
   };
 
+  const handleNavMouseLeave = () => {
+    mouseLeaveTimeoutRef.current = window.setTimeout(() => {
+      setIsDropdownOpen(false);
+    }, 200);
+  };
+
+  // Click outside to close the dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (navRef.current && !navRef.current.contains(event.target as Node)) {
@@ -308,12 +316,7 @@ const AppleNavbar: React.FC = () => {
     };
   }, []);
 
-  const handleNavMouseLeave = () => {
-    mouseLeaveTimeoutRef.current = window.setTimeout(() => {
-      setIsDropdownOpen(false);
-    }, 360);
-  };
-
+  // Cleanup timeouts
   useEffect(() => {
     return () => {
       if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
@@ -321,6 +324,7 @@ const AppleNavbar: React.FC = () => {
     };
   }, []);
 
+  // Control body overflow for mobile menu
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -337,7 +341,8 @@ const AppleNavbar: React.FC = () => {
   };
 
   return (
-    <div ref={navRef} style={{ width: '100vw' }}>
+    <div ref={navRef} style={{ width: '100vw' }} onMouseLeave={handleNavMouseLeave}>
+      {/* Mobile header */}
       <div className="md:hidden flex w-screen items-center justify-between h-12 px-2 bg-black">
         <Link to="/" className="h-12 w-11 flex items-center">
           <svg width="22" height="26" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -360,6 +365,7 @@ const AppleNavbar: React.FC = () => {
         </button>
       </div>
 
+      {/* Mobile fullscreen menu */}
       <div
         className={`
           fixed top-0 left-0 z-[99999] w-screen h-screen bg-[#18181b] transition-all duration-300
