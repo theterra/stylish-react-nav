@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Search, ShoppingBag, Menu, X } from 'lucide-react';
@@ -206,7 +205,7 @@ const AppleNavbar: React.FC = () => {
   const timeoutRef = useRef<number | null>(null);
   const mouseLeaveTimeoutRef = useRef<number | null>(null);
 
-  // Dropdown hover logic with delay to prevent flickering
+  // Dropdown hover logic
   const handleMenuMouseEnter = (key: string) => {
     if (timeoutRef.current !== null) {
       window.clearTimeout(timeoutRef.current);
@@ -220,28 +219,24 @@ const AppleNavbar: React.FC = () => {
     setIsDropdownOpen(true);
   };
 
-  // Handle clicks outside the navbar to close the dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (navRef.current && !navRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
-  // Animate dropdown close: first fade content, then collapse container
   const handleNavMouseLeave = () => {
     mouseLeaveTimeoutRef.current = window.setTimeout(() => {
       setIsDropdownOpen(false);
-    }, 360); // Delay should match dropdown fade duration for smoothness
+    }, 360);
   };
 
-  // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
       if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
@@ -249,29 +244,80 @@ const AppleNavbar: React.FC = () => {
     };
   }, []);
 
+  // Lock scroll when mobile nav is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
   return (
     <div ref={navRef} style={{ width: '100vw' }}>
       {/* MOBILE: Navigation bar */}
-      <MobileRow>
-        <LogoLink to="/">
-          <AppleIcon />
-        </LogoLink>
-        <MobileIconsRow>
-          <IconButton aria-label="Search">
-            <Search size={20} />
-          </IconButton>
-          <IconButton aria-label="Shopping Bag">
-            <ShoppingBag size={20} />
-          </IconButton>
-          <IconButton
-            style={{ marginLeft: '6px' }}
-            aria-label={isMobileMenuOpen ? "Close Menu" : "Open Menu"}
-            onClick={() => setIsMobileMenuOpen(o => !o)}
-          >
-            {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-          </IconButton>
-        </MobileIconsRow>
-      </MobileRow>
+      <div className="md:hidden flex w-screen items-center justify-between h-12 px-2 bg-black">
+        <Link to="/" className="h-12 w-11 flex items-center">
+          <svg width="22" height="26" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13.0729 6.26726C12.9825 6.33855 11.3458 7.21353 11.3458 9.17609C11.3458 11.4551 13.4441 12.2398 13.5 12.2398C13.4888 12.2856 13.1823 13.3784 12.3979 14.4939C11.7042 15.4695 10.9767 16.4451 9.85126 16.4451C8.77047 16.4451 8.42813 15.8056 7.16798 15.8056C5.9636 15.8056 5.48878 16.4451 4.50774 16.4451C3.38233 16.4451 2.59938 15.4237 1.87818 14.4481C1.04168 13.3096 0.316239 11.5638 0.316239 9.9054C0.316239 7.18268 1.99461 5.7502 3.62725 5.7502C4.66381 5.7502 5.53454 6.44508 6.19401 6.44508C6.81924 6.44508 7.77908 5.7502 8.95072 5.7502C9.35883 5.7502 11.0697 5.7959 12.2414 7.3919C12.168 7.43785 13.0729 6.26726 13.0729 6.26726ZM9.14123 4.24802C9.64879 3.65271 10.0011 2.81345 10.0011 1.97419C10.0011 1.85695 9.98991 1.73971 9.97867 1.64829C9.19571 1.67114 8.25707 2.15135 7.67607 2.80049C7.20125 3.30654 6.76039 4.14579 6.76039 4.99664C6.76039 5.12546 6.78282 5.25428 6.78282 5.28871C6.83854 5.3001 6.92879 5.31148 7.01904 5.31148C7.7291 5.31148 8.60546 4.86559 9.14123 4.24802Z" fill="white"/>
+          </svg>
+        </Link>
+        <button
+          aria-label={isMobileMenuOpen ? "Close Menu" : "Open Menu"}
+          className="rounded focus:outline-none"
+          onClick={() => setIsMobileMenuOpen(o => !o)}
+        >
+          {isMobileMenuOpen
+            ? <X size={28} className="text-zinc-200" />
+            : <Menu size={28} className="text-zinc-200" />}
+        </button>
+      </div>
+
+      {/* MOBILE: Fullscreen Overlay Menu */}
+      <div
+        className={`
+          fixed top-0 left-0 z-[99999] w-screen h-screen bg-[#18181b] transition-all duration-300
+          ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto scale-100' : 'opacity-0 pointer-events-none scale-98'}
+          flex md:hidden
+        `}
+        style={{
+          backdropFilter: isMobileMenuOpen ? "blur(2px)" : undefined,
+          transition: 'opacity 0.3s cubic-bezier(.4,0,.2,1), transform 0.33s cubic-bezier(.4,0,.2,1)'
+        }}
+      >
+        {/* CLOSE BUTTON */}
+        <button
+          className="absolute top-7 right-7 z-10"
+          aria-label="Close Menu"
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          <X size={34} className="text-zinc-200" />
+        </button>
+        {/* Menu List */}
+        <nav className="flex flex-col items-start justify-center w-full h-full px-8 select-none">
+          <ul className="w-full flex flex-col gap-3">
+            {navLinks.map((link) => (
+              <li key={link.title}>
+                <Link
+                  to={link.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-zinc-100 font-normal text-[2.1rem] leading-tight tracking-tight block py-[0.15em] px-2 hover:opacity-85 transition-opacity"
+                  style={{
+                    fontWeight: 400,
+                    letterSpacing: '-0.011em'
+                  }}
+                >
+                  {link.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
 
       {/* DESKTOP: Navigation bar */}
       <NavContainer>
@@ -300,17 +346,6 @@ const AppleNavbar: React.FC = () => {
         </NavContent>
       </NavContainer>
 
-      {/* MOBILE: Slide-down menu */}
-      <MobileMenu isOpen={isMobileMenuOpen}>
-        <MobileNavList>
-          {navLinks.map((link) => (
-            <MobileNavItem key={link.title}>
-              <NavLink to={link.path} onClick={() => setIsMobileMenuOpen(false)}>{link.title}</NavLink>
-            </MobileNavItem>
-          ))}
-        </MobileNavList>
-      </MobileMenu>
-
       {/* DESKTOP: Full-width mega dropdown */}
       <AppleMegaDropdown
         visible={isDropdownOpen}
@@ -321,4 +356,3 @@ const AppleNavbar: React.FC = () => {
 };
 
 export default AppleNavbar;
-
