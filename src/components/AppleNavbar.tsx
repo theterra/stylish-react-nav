@@ -283,7 +283,6 @@ const AppleNavbar: React.FC = () => {
   const timeoutRef = useRef<number | null>(null);
   const mouseLeaveTimeoutRef = useRef<number | null>(null);
 
-  // Dropdown hover logic
   const handleMenuMouseEnter = (key: string) => {
     if (timeoutRef.current !== null) {
       window.clearTimeout(timeoutRef.current);
@@ -322,7 +321,6 @@ const AppleNavbar: React.FC = () => {
     };
   }, []);
 
-  // Lock scroll when mobile nav is open
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -340,7 +338,6 @@ const AppleNavbar: React.FC = () => {
 
   return (
     <div ref={navRef} style={{ width: '100vw' }}>
-      {/* MOBILE: Navigation bar */}
       <div className="md:hidden flex w-screen items-center justify-between h-12 px-2 bg-black">
         <Link to="/" className="h-12 w-11 flex items-center">
           <svg width="22" height="26" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -363,7 +360,6 @@ const AppleNavbar: React.FC = () => {
         </button>
       </div>
 
-      {/* MOBILE: Menu overlay */}
       <div
         className={`
           fixed top-0 left-0 z-[99999] w-screen h-screen bg-[#18181b] transition-all duration-300
@@ -377,7 +373,6 @@ const AppleNavbar: React.FC = () => {
           transition: 'opacity 0.3s cubic-bezier(.4,0,.2,1), transform 0.33s cubic-bezier(.4,0,.2,1)'
         }}
       >
-        {/* CLOSE BUTTON */}
         <button
           className="absolute top-7 right-7 z-10"
           aria-label="Close Menu"
@@ -387,7 +382,6 @@ const AppleNavbar: React.FC = () => {
           <X size={34} className="text-zinc-200" />
         </button>
         
-        {/* Main Menu (visible when no submenu is active) */}
         {!activeMobileMenu && (
           <ScrollArea className="w-full h-full px-8 py-10">
             <nav className="flex flex-col items-start justify-center w-full select-none">
@@ -413,40 +407,18 @@ const AppleNavbar: React.FC = () => {
           </ScrollArea>
         )}
 
-        {/* Submenu (renders in the same container as main menu) */}
         {activeMobileMenu && (
-          <div className="w-full h-full">
-            <div className="flex items-center justify-between px-6 pt-7 pb-5">
-              <button aria-label="Back" onClick={() => setActiveMobileMenu(null)}>
-                <ChevronLeft size={32} className="text-zinc-300" />
-              </button>
-              <span className="text-lg font-medium text-zinc-200 truncate flex-1 text-center">
-                {activeMobileMenu}
-              </span>
-              <button aria-label="Close menu" onClick={() => setIsMobileMenuOpen(false)}>
-                <X size={28} className="text-zinc-200" />
-              </button>
-            </div>
-            <ScrollArea className="w-full h-[calc(100%-70px)] px-4 pb-5">
-              <ul className="flex flex-col gap-3">
-                {activeMobileMenu && mobileSubmenus[activeMobileMenu]?.map((item) => (
-                  <li key={item.label}>
-                    <a
-                      href={item.path || "#"}
-                      className="block text-2xl md:text-3xl font-medium text-white py-2 px-2 rounded hover:bg-zinc-800 transition-colors"
-                      style={{ wordBreak: "break-word" }}
-                    >
-                      {item.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </ScrollArea>
-          </div>
+          <MobileMenuSubpanel
+            open={!!activeMobileMenu}
+            menuLabel={activeMobileMenu}
+            items={activeMobileMenu ? mobileSubmenus[activeMobileMenu] : []}
+            onClose={() => setIsMobileMenuOpen(false)}
+            onBack={() => setActiveMobileMenu(null)}
+            hideCloseButton={true}
+          />
         )}
       </div>
 
-      {/* DESKTOP: Navigation bar */}
       <NavContainer>
         <NavContent>
           <LogoLink to="/">
@@ -473,7 +445,6 @@ const AppleNavbar: React.FC = () => {
         </NavContent>
       </NavContainer>
 
-      {/* DESKTOP: Full-width mega dropdown */}
       <AppleMegaDropdown
         visible={isDropdownOpen}
         menuKey={dropdownMenuKey}
