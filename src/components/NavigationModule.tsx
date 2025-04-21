@@ -156,6 +156,16 @@ const MobileHeader = styled.div`
   background: #000;
 `;
 
+const ScrollAreaWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  padding: 44px 0 0 0;
+`;
+
+const MobileNav = styled.nav`
+  width: 100%;
+`;
+
 const MobileMenuList = styled.ul`
   width: 100%;
   display: flex;
@@ -292,7 +302,7 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
             </MobileMenuCloseBtn>
 
             <ScrollArea style={{ width: "100%", height: "100%", padding: "44px 0 0 0" }}>
-              <nav style={{ width: "100%" }}>
+              <MobileNav>
                 <MobileMenuList>
                   {navLinks.map((link) => (
                     <li key={link.title}>
@@ -305,7 +315,7 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
                     </li>
                   ))}
                 </MobileMenuList>
-              </nav>
+              </MobileNav>
             </ScrollArea>
           </>
         )}
@@ -354,4 +364,3 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
 };
 
 export default NavigationModule;
-
