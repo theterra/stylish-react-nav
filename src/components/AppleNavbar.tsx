@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Search, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -161,20 +162,35 @@ const AppleNavbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [dropdownMenuKey, setDropdownMenuKey] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
 
-  // Dropdown hover logic
+  // Dropdown hover logic - updated to persist dropdown
   const handleMenuMouseEnter = (key: string) => {
     setDropdownMenuKey(key);
     setIsDropdownOpen(true);
   };
-  const handleMenuMouseLeave = () => {
+
+  // Handle clicks outside the navbar to close the dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Handle mouse leaving the entire navbar area
+  const handleNavMouseLeave = () => {
     setIsDropdownOpen(false);
-    // Don't reset key immediately to allow animation out
-    setTimeout(() => setDropdownMenuKey(null), 290);
   };
 
   return (
-    <>
+    <div ref={navRef} onMouseLeave={handleNavMouseLeave}>
       <NavContainer>
         <NavContent>
           <LogoLink to="/">
@@ -187,8 +203,6 @@ const AppleNavbar: React.FC = () => {
               <NavItem
                 key={link.title}
                 onMouseEnter={() => handleMenuMouseEnter(link.title)}
-                onMouseLeave={handleMenuMouseLeave}
-                style={{ position: 'relative' }}
               >
                 <NavLink to={link.path}>{link.title}</NavLink>
               </NavItem>
@@ -226,7 +240,7 @@ const AppleNavbar: React.FC = () => {
         visible={isDropdownOpen}
         menuKey={dropdownMenuKey}
       />
-    </>
+    </div>
   );
 };
 

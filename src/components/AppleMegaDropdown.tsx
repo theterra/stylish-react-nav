@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
@@ -80,7 +79,6 @@ const DummyDropdownData: Record<string, any> = {
       },
     ],
   },
-  // ... Add similar blocks for other menu items as needed
   iPad: {
     sections: [
       {
@@ -116,7 +114,6 @@ const DummyDropdownData: Record<string, any> = {
       },
     ],
   },
-  // Fallback: empty sections for others (for demo)
   iPhone: {
     sections: [
       {
@@ -153,7 +150,7 @@ const DummyDropdownData: Record<string, any> = {
   },
 };
 
-const DropdownAnim = styled.div<{ visible: boolean; dropdownHeight: number }>`
+const DropdownAnim = styled.div<{ visible: boolean }>`
   position: fixed;
   left: 0;
   top: 44px;
@@ -165,8 +162,10 @@ const DropdownAnim = styled.div<{ visible: boolean; dropdownHeight: number }>`
   display: flex;
   justify-content: center;
   overflow: hidden;
-  height: ${({ visible, dropdownHeight }) => (visible ? `${dropdownHeight}px` : "0px")};
-  transition: height 0.36s cubic-bezier(.4,0,.2,1);
+  height: ${({ visible }) => (visible ? "auto" : "0px")};
+  max-height: ${({ visible }) => (visible ? "600px" : "0px")};
+  transition: max-height 0.36s cubic-bezier(.4,0,.2,1);
+  padding: ${({ visible }) => (visible ? "42px 0 52px 0" : "0")};
 `;
 
 const MegaMenu = styled.div`
@@ -175,7 +174,6 @@ const MegaMenu = styled.div`
   display: grid;
   grid-template-columns: 1.2fr 1fr 1fr;
   gap: 70px;
-  padding: 42px 0 52px 0;
 `;
 
 const Col = styled.div`
@@ -219,32 +217,19 @@ const RegularLink = styled(Link)`
   }
 `;
 
-// Dynamically adjust dropdown height to content
 export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
   menuKey,
   visible,
 }) => {
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [dropdownHeight, setDropdownHeight] = useState(0);
-
-  // Adjust height on visible or menuKey change
-  useEffect(() => {
-    if (visible && contentRef.current) {
-      setDropdownHeight(contentRef.current.offsetHeight);
-    } else {
-      setDropdownHeight(0);
-    }
-  }, [visible, menuKey]);
-
   if (!menuKey || !(menuKey in DummyDropdownData)) return (
-    <DropdownAnim visible={false} dropdownHeight={0} aria-hidden />
+    <DropdownAnim visible={false} aria-hidden />
   );
 
   const dropdown = DummyDropdownData[menuKey];
 
   return (
-    <DropdownAnim visible={visible} dropdownHeight={dropdownHeight} aria-hidden={!visible}>
-      <MegaMenu ref={contentRef}>
+    <DropdownAnim visible={visible} aria-hidden={!visible}>
+      <MegaMenu>
         {dropdown.sections.map((section: any, sectionIdx: number) => (
           <Col key={sectionIdx}>
             <SectionTitle>{section.title}</SectionTitle>
