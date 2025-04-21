@@ -90,7 +90,6 @@ const NavItem = styled.li`
   padding: 0 10px;
   opacity: 0.8;
   transition: opacity 0.3s;
-
   &:hover {
     opacity: 1;
   }
@@ -107,7 +106,6 @@ const NavLinkStyled = styled(Link)`
 const IconContainer = styled.div`
   display: flex;
   gap: 24px;
-
   @media (max-width: 768px) {
     display: none;
   }
@@ -124,10 +122,75 @@ const IconButton = styled.button`
   opacity: 0.8;
   transition: opacity 0.3s;
   padding: 0;
-
   &:hover {
     opacity: 1;
   }
+`;
+
+const MobileMenuDrawer = styled.div<{ open: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  width: 100vw;
+  height: 100vh;
+  background: #18181b;
+  transition: opacity 0.3s cubic-bezier(.4,0,.2,1), transform 0.33s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  opacity: ${({ open }) => open ? 1 : 0};
+  pointer-events: ${({ open }) => open ? 'auto' : 'none'};
+  transform: ${({ open }) => open ? 'scale(1)' : 'scale(0.98)'};
+  backdrop-filter: ${({ open }) => open ? "blur(2px)" : "none"};
+  @media (min-width: 769px) {
+    display: none;
+  }
+`;
+
+const MobileHeader = styled.div`
+  display: flex;
+  width: 100vw;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 8px 0 2px;
+  background: #000;
+`;
+
+const MobileMenuList = styled.ul`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0 34px;
+  margin: 0;
+  list-style: none;
+`;
+
+const MobileMenuButton = styled.button`
+  background: none;
+  border: none;
+  color: #f2f2f2;
+  font-size: 2.1rem;
+  font-weight: 400;
+  text-align: left;
+  padding: 0.2em 0.5em 0.2em 0.2em;
+  width: 100%;
+  cursor: pointer;
+  transition: opacity 0.18s;
+  &:hover {
+    opacity: 0.85;
+  }
+`;
+
+const MobileMenuCloseBtn = styled.button`
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 10;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #aaa;
 `;
 
 const NavigationModule: React.FC<NavigationModuleProps> = ({
@@ -155,10 +218,12 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
     setIsDropdownOpen(true);
   };
 
-  const handleNavMouseLeave = () => {
-    mouseLeaveTimeoutRef.current = window.setTimeout(() => {
+  const handleNavMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    const navRect = navRef.current?.getBoundingClientRect();
+    if (navRect && (e.clientX < navRect.left || e.clientX > navRect.right || e.clientY < navRect.top || e.clientY > navRect.bottom)) {
       setIsDropdownOpen(false);
-    }, 200);
+      setDropdownMenuKey(null);
+    }
   };
 
   useEffect(() => {
@@ -196,13 +261,12 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
   return (
     <div ref={navRef} style={{ width: '100vw' }} onMouseLeave={handleNavMouseLeave}>
       {/* Mobile header */}
-      <div className="md:hidden flex w-screen items-center justify-between h-12 px-2 bg-black">
-        <Link to="/" className="h-12 w-11 flex items-center">
+      <MobileHeader>
+        <LogoLink to="/">
           <AppleIcon />
-        </Link>
-        <button
+        </LogoLink>
+        <IconButton
           aria-label={isMobileMenuOpen ? "Close Menu" : "Open Menu"}
-          className="rounded focus:outline-none"
           onClick={() => {
             setIsMobileMenuOpen((o) => !o);
             if (!isMobileMenuOpen) {
@@ -211,61 +275,40 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
           }}
         >
           {isMobileMenuOpen
-            ? <X size={28} className="text-zinc-200" />
-            : <Menu size={28} className="text-zinc-200" />}
-        </button>
-      </div>
+            ? <X size={28} style={{ color: "#F5F5F7" }} />
+            : <Menu size={28} style={{ color: "#F5F5F7" }} />}
+        </IconButton>
+      </MobileHeader>
 
       {/* Mobile Menu Drawer */}
-      <div
-        className={`
-          fixed top-0 left-0 z-[99999] w-screen h-screen bg-[#18181b] transition-all duration-300
-          ${isMobileMenuOpen 
-            ? 'opacity-100 pointer-events-auto scale-100'
-            : 'opacity-0 pointer-events-none scale-98'}
-          flex md:hidden
-        `}
-        style={{
-          backdropFilter: isMobileMenuOpen ? "blur(2px)" : undefined,
-          transition: 'opacity 0.3s cubic-bezier(.4,0,.2,1), transform 0.33s cubic-bezier(.4,0,.2,1)'
-        }}
-      >
+      <MobileMenuDrawer open={isMobileMenuOpen}>
         {!activeMobileMenu && (
-          <button
-            className="absolute top-7 right-7 z-10"
-            aria-label="Close Menu"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <X size={34} className="text-zinc-200" />
-          </button>
-        )}
-        
-        {!activeMobileMenu && (
-          <ScrollArea className="w-full h-full px-8 py-10">
-            <nav className="flex flex-col items-start justify-center w-full select-none">
-              <ul className="w-full flex flex-col gap-3">
-                {navLinks.map((link) => (
-                  <li key={link.title}>
-                    <button
-                      type="button"
-                      className="text-zinc-100 font-normal text-[2.1rem] leading-tight tracking-tight block py-[0.15em] px-2 hover:opacity-85 transition-opacity w-full text-left"
-                      style={{
-                        fontWeight: 400,
-                        letterSpacing: '-0.011em',
-                        wordBreak: "break-word"
-                      }}
-                      onClick={() => handleMobileNavClick(link.title)}
-                    >
-                      {link.title}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </ScrollArea>
-        )}
+          <>
+            <MobileMenuCloseBtn
+              aria-label="Close Menu"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <X size={34} style={{ color: "#caced6" }} />
+            </MobileMenuCloseBtn>
 
+            <ScrollArea style={{ width: "100%", height: "100%", padding: "44px 0 0 0" }}>
+              <nav style={{ width: "100%" }}>
+                <MobileMenuList>
+                  {navLinks.map((link) => (
+                    <li key={link.title}>
+                      <MobileMenuButton
+                        type="button"
+                        onClick={() => handleMobileNavClick(link.title)}
+                      >
+                        {link.title}
+                      </MobileMenuButton>
+                    </li>
+                  ))}
+                </MobileMenuList>
+              </nav>
+            </ScrollArea>
+          </>
+        )}
         {activeMobileMenu && (
           <MobileMenuSubpanel
             open={!!activeMobileMenu}
@@ -276,7 +319,7 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
             hideCloseButton={false}
           />
         )}
-      </div>
+      </MobileMenuDrawer>
 
       {/* Desktop Navbar */}
       <NavContainer>
