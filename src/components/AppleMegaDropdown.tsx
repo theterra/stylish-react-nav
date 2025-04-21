@@ -1,4 +1,5 @@
-import React, { useRef, useEffect, useState } from "react";
+
+import React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
@@ -162,9 +163,10 @@ const DropdownAnim = styled.div<{ visible: boolean }>`
   display: flex;
   justify-content: center;
   overflow: hidden;
-  height: ${({ visible }) => (visible ? "auto" : "0px")};
-  max-height: ${({ visible }) => (visible ? "600px" : "0px")};
-  transition: max-height 0.36s cubic-bezier(.4,0,.2,1);
+  opacity: ${({ visible }) => (visible ? "1" : "0")};
+  max-height: ${({ visible }) => (visible ? "600px" : "0")};
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  visibility: ${({ visible }) => (visible ? "visible" : "hidden")};
   padding: ${({ visible }) => (visible ? "42px 0 52px 0" : "0")};
 `;
 

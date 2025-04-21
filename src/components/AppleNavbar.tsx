@@ -163,9 +163,16 @@ const AppleNavbar: React.FC = () => {
   const [dropdownMenuKey, setDropdownMenuKey] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<number | null>(null);
 
-  // Dropdown hover logic - updated to persist dropdown
+  // Dropdown hover logic with delay to prevent flickering
   const handleMenuMouseEnter = (key: string) => {
+    // Clear any existing timeout
+    if (timeoutRef.current !== null) {
+      window.clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    
     setDropdownMenuKey(key);
     setIsDropdownOpen(true);
   };
@@ -184,10 +191,22 @@ const AppleNavbar: React.FC = () => {
     };
   }, []);
 
-  // Handle mouse leaving the entire navbar area
+  // Handle mouse leaving the entire navbar area with a slight delay
   const handleNavMouseLeave = () => {
-    setIsDropdownOpen(false);
+    // Add a small delay before closing to prevent accidental closings
+    timeoutRef.current = window.setTimeout(() => {
+      setIsDropdownOpen(false);
+    }, 150);
   };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div ref={navRef} onMouseLeave={handleNavMouseLeave}>
