@@ -161,73 +161,67 @@ const AppleNavbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isStoreDropdownOpen, setIsStoreDropdownOpen] = useState(false);
 
+  // Dropdown hover logic
+  const handleStoreMouseEnter = () => setIsStoreDropdownOpen(true);
+  const handleStoreMouseLeave = () => setIsStoreDropdownOpen(false);
+
   return (
-    <NavContainer>
-      <NavContent>
-        <LogoLink to="/">
-          <AppleIcon />
-        </LogoLink>
+    <>
+      <NavContainer>
+        <NavContent>
+          <LogoLink to="/">
+            <AppleIcon />
+          </LogoLink>
 
-        {/* Desktop Navigation */}
-        <NavList>
-          {navLinks.map((link) =>
-            link.title === 'Store' ? (
-              <NavItem
-                key={link.title}
-                onMouseEnter={() => setIsStoreDropdownOpen(true)}
-                onMouseLeave={() => setIsStoreDropdownOpen(false)}
-                style={{ position: 'relative' }}
-              >
+          {/* Desktop Navigation */}
+          <NavList>
+            {navLinks.map((link) =>
+              link.title === 'Store' ? (
+                <NavItem
+                  key={link.title}
+                  onMouseEnter={handleStoreMouseEnter}
+                  onMouseLeave={handleStoreMouseLeave}
+                  style={{ position: 'relative' }}
+                >
+                  <NavLink to={link.path}>{link.title}</NavLink>
+                </NavItem>
+              ) : (
+                <NavItem key={link.title}>
+                  <NavLink to={link.path}>{link.title}</NavLink>
+                </NavItem>
+              )
+            )}
+          </NavList>
+
+          <IconContainer>
+            <IconButton aria-label="Search">
+              <Search size={16} />
+            </IconButton>
+            <IconButton aria-label="Shopping Bag">
+              <ShoppingBag size={16} />
+            </IconButton>
+          </IconContainer>
+
+          <MobileMenuButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {isMobileMenuOpen ? 'Close' : 'Menu'}
+          </MobileMenuButton>
+        </NavContent>
+
+        {/* Mobile Navigation */}
+        <MobileMenu isOpen={isMobileMenuOpen}>
+          <MobileNavList>
+            {navLinks.map((link) => (
+              <MobileNavItem key={link.title}>
                 <NavLink to={link.path}>{link.title}</NavLink>
-                {isStoreDropdownOpen && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      top: "100%",
-                      width: "100vw",
-                      zIndex: 1000,
-                    }}
-                    onMouseEnter={() => setIsStoreDropdownOpen(true)}
-                    onMouseLeave={() => setIsStoreDropdownOpen(false)}
-                  >
-                    <AppleStoreDropdown />
-                  </div>
-                )}
-              </NavItem>
-            ) : (
-              <NavItem key={link.title}>
-                <NavLink to={link.path}>{link.title}</NavLink>
-              </NavItem>
-            )
-          )}
-        </NavList>
+              </MobileNavItem>
+            ))}
+          </MobileNavList>
+        </MobileMenu>
+      </NavContainer>
 
-        <IconContainer>
-          <IconButton aria-label="Search">
-            <Search size={16} />
-          </IconButton>
-          <IconButton aria-label="Shopping Bag">
-            <ShoppingBag size={16} />
-          </IconButton>
-        </IconContainer>
-
-        <MobileMenuButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-          {isMobileMenuOpen ? 'Close' : 'Menu'}
-        </MobileMenuButton>
-      </NavContent>
-
-      {/* Mobile Navigation */}
-      <MobileMenu isOpen={isMobileMenuOpen}>
-        <MobileNavList>
-          {navLinks.map((link) => (
-            <MobileNavItem key={link.title}>
-              <NavLink to={link.path}>{link.title}</NavLink>
-            </MobileNavItem>
-          ))}
-        </MobileNavList>
-      </MobileMenu>
-    </NavContainer>
+      {/* Outside nav for full-width dropdown and animation */}
+      <AppleStoreDropdown visible={isStoreDropdownOpen} />
+    </>
   );
 };
 
