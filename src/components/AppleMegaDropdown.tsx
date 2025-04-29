@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
@@ -281,8 +280,8 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
     hidden: { 
       opacity: 0,
       transition: { 
-        duration: 0.3, 
-        ease: "easeInOut" 
+        duration: 0.4,
+        ease: "easeOut"
       }
     },
     visible: { 
@@ -300,11 +299,11 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
       opacity: 0,
       transition: {
         height: { 
-          duration: 0.45, // Increased duration for closing
-          ease: [0.19, 1, 0.22, 1] // Custom easing for smoother animation
+          duration: 0.5, 
+          ease: [0.19, 1, 0.22, 1]
         },
         opacity: { 
-          duration: 0.45, // Match height duration for closing
+          duration: 0.2,
           ease: "easeInOut" 
         }
       }
@@ -315,7 +314,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
       transition: {
         height: { 
           duration: 0.45, 
-          ease: [0.19, 1, 0.22, 1] // Custom easing for smoother animation
+          ease: [0.19, 1, 0.22, 1]
         },
         opacity: { 
           duration: 0.3, 
@@ -331,15 +330,8 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
       opacity: 0, 
       y: -10,
       transition: { 
-        duration: 0.3, // Increased for smoother exit
-        ease: [0.4, 0, 0.2, 1],
-        opacity: { 
-          duration: 0.25 
-        },
-        y: {
-          duration: 0.3
-        },
-        when: "afterChildren" // Wait for children to animate out first
+        duration: 0.25, 
+        ease: "easeInOut"
       }
     },
     visible: { 
@@ -384,24 +376,24 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
   const dropdown = DummyDropdownData[menuKey];
   
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="sync">
       {visible && (
         <>
           <BackdropOverlay
+            key="backdrop"
             initial="hidden"
             animate="visible"
             exit="hidden"
             variants={backdropVariants}
             aria-hidden={!visible ? "true" : "false"}
             onClick={(e) => {
-              // Prevent the click from propagating to elements below
               e.stopPropagation();
-              // Dispatch close event
               const closeEvent = new CustomEvent('close-mega-dropdown');
               document.dispatchEvent(closeEvent);
             }}
           />
           <DropdownContainer
+            key="dropdown"
             ref={dropdownRef}
             initial="hidden"
             animate="visible"
@@ -411,6 +403,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
             onMouseLeave={onMouseLeave}
           >
             <ContentWrapper
+              key="content"
               variants={contentVariants}
               initial="hidden"
               animate="visible"
