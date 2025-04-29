@@ -6,13 +6,14 @@ import {
   ToastDescription,
   ToastTitle,
   ToastViewport,
+  ToastProvider
 } from "./toast"
 
 export function Toaster() {
   const { toasts } = useToast()
 
   return (
-    <div className="toaster-provider">
+    <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
         return (
           <Toast key={id} {...props}>
@@ -28,6 +29,6 @@ export function Toaster() {
         )
       })}
       <ToastViewport />
-    </div>
+    </ToastProvider>
   )
 }
