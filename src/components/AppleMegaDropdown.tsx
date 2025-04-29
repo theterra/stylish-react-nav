@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface AppleMegaDropdownProps {
   menuKey: string | null;
@@ -153,20 +154,18 @@ const DummyDropdownData: Record<string, any> = {
 };
 
 // Backdrop overlay that will blur the background content
-const BackdropOverlay = styled.div<{ $visible: boolean }>`
+const BackdropOverlay = styled(motion.div)`
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, ${({ $visible }) => ($visible ? "0.2" : "0")});
-  backdrop-filter: ${({ $visible }) => ($visible ? "blur(5px)" : "none")};
-  -webkit-backdrop-filter: ${({ $visible }) => ($visible ? "blur(5px)" : "none")};
-  pointer-events: ${({ $visible }) => ($visible ? "auto" : "none")};
-  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
-  transition: opacity 0.3s ease, backdrop-filter 0.3s ease, -webkit-backdrop-filter 0.3s ease;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  pointer-events: auto;
   z-index: 900;
 `;
 
-// Animation: collapse height, fade content for smooth open/close
-const DropdownAnim = styled.div<{ $visible: boolean }>`
+// Using motion.div for animated container
+const DropdownContainer = styled(motion.div)`
   position: fixed;
   left: 0;
   top: 44px;
@@ -181,13 +180,7 @@ const DropdownAnim = styled.div<{ $visible: boolean }>`
   display: flex;
   justify-content: center;
   overflow: hidden;
-  /* Height transition */
-  max-height: ${({ $visible }) => ($visible ? "550px" : "0")};
-  transition: max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1), 
-              backdrop-filter 0.3s ease,
-              -webkit-backdrop-filter 0.3s ease;
-  visibility: ${({ $visible }) => ($visible ? "visible" : "hidden")};
-  padding: ${({ $visible }) => ($visible ? "42px 0 52px 0" : "0")};
+  padding: 42px 0 52px 0;
 
   @media (max-width: 1080px) {
     max-width: 100vw;
@@ -196,11 +189,7 @@ const DropdownAnim = styled.div<{ $visible: boolean }>`
   }
 `;
 
-const ContentWrapper = styled.div<{ $visible: boolean }>`
-  opacity: ${({ $visible }) => ($visible ? "1" : "0")};
-  transform: translateY(${({ $visible }) => ($visible ? "0" : "-10px")});
-  transition: opacity 0.33s cubic-bezier(0.4, 0, 0.2, 1), transform 0.33s cubic-bezier(0.4, 0, 0.2, 1);
-  transition-delay: ${({ $visible }) => ($visible ? "0.08s" : "0s")};
+const ContentWrapper = styled(motion.div)`
   width: 100vw;
   max-width: 1024px;
   overflow-x: auto;
@@ -283,17 +272,49 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
   onMouseEnter,
   onMouseLeave
 }) => {
-  // Unmount content after close for accessibility and layout
-  const [shouldRender, setShouldRender] = useState(visible);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (visible) setShouldRender(true);
-    else {
-      const timeout = setTimeout(() => setShouldRender(false), 430); // match closing transition
-      return () => clearTimeout(timeout);
+  // Animation variants
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.3 } }
+  };
+  
+  const dropdownVariants = {
+    hidden: { 
+      height: 0,
+      opacity: 0,
+      transition: {
+        height: { duration: 0.3, ease: [0.16, 1, 0.3, 1] },
+        opacity: { duration: 0.2 }
+      }
+    },
+    visible: { 
+      height: "auto", 
+      opacity: 1,
+      transition: {
+        height: { duration: 0.45, ease: [0.16, 1, 0.3, 1] },
+        opacity: { duration: 0.3, delay: 0.05 }
+      }
     }
-  }, [visible]);
+  };
+  
+  const contentVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: -10,
+      transition: { duration: 0.2, ease: [0.4, 0, 0.2, 1] }
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        duration: 0.33, 
+        ease: [0.4, 0, 0.2, 1],
+        delay: 0.08
+      }
+    }
+  };
 
   // Add body scroll lock when dropdown is open
   useEffect(() => {
@@ -321,54 +342,59 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [visible]);
 
-  if (!menuKey || !(menuKey in DummyDropdownData)) return (
-    <>
-      <BackdropOverlay $visible={false} aria-hidden="true" />
-      <DropdownAnim $visible={false} aria-hidden="true" />
-    </>
-  );
+  if (!menuKey || !(menuKey in DummyDropdownData)) return null;
 
   const dropdown = DummyDropdownData[menuKey];
+  
   return (
-    <>
-      <BackdropOverlay 
-        $visible={visible} 
-        aria-hidden={!visible ? "true" : "false"} 
-        onClick={(e) => {
-          // Prevent the click from propagating to elements below
-          e.stopPropagation();
-          // Dispatch close event
-          const closeEvent = new CustomEvent('close-mega-dropdown');
-          document.dispatchEvent(closeEvent);
-        }} 
-      />
-      <DropdownAnim 
-        $visible={visible} 
-        aria-hidden={!visible ? "true" : "false"}
-        ref={dropdownRef}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-      >
-        {shouldRender &&
-          <ContentWrapper $visible={visible}>
-            <MegaMenu>
-              {dropdown.sections.map((section: any, sectionIdx: number) => (
-                <Col key={sectionIdx}>
-                  <SectionTitle>{section.title}</SectionTitle>
-                  {section.items.map((item: any, idx: number) =>
-                    idx < 2 && sectionIdx === 0 ? (
-                      <SectionLink key={item.label} to={item.path}>{item.label}</SectionLink>
-                    ) : (
-                      <RegularLink key={item.label} to={item.path}>{item.label}</RegularLink>
-                    )
-                  )}
-                </Col>
-              ))}
-            </MegaMenu>
-          </ContentWrapper>
-        }
-      </DropdownAnim>
-    </>
+    <AnimatePresence>
+      {visible && (
+        <>
+          <BackdropOverlay
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={backdropVariants}
+            aria-hidden={!visible ? "true" : "false"}
+            onClick={(e) => {
+              // Prevent the click from propagating to elements below
+              e.stopPropagation();
+              // Dispatch close event
+              const closeEvent = new CustomEvent('close-mega-dropdown');
+              document.dispatchEvent(closeEvent);
+            }}
+          />
+          <DropdownContainer
+            ref={dropdownRef}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={dropdownVariants}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+          >
+            <ContentWrapper
+              variants={contentVariants}
+            >
+              <MegaMenu>
+                {dropdown.sections.map((section: any, sectionIdx: number) => (
+                  <Col key={sectionIdx}>
+                    <SectionTitle>{section.title}</SectionTitle>
+                    {section.items.map((item: any, idx: number) =>
+                      idx < 2 && sectionIdx === 0 ? (
+                        <SectionLink key={item.label} to={item.path}>{item.label}</SectionLink>
+                      ) : (
+                        <RegularLink key={item.label} to={item.path}>{item.label}</RegularLink>
+                      )
+                    )}
+                  </Col>
+                ))}
+              </MegaMenu>
+            </ContentWrapper>
+          </DropdownContainer>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 
