@@ -25,3 +25,8 @@ export function Tooltip({ children, text }) {
     </span>
   )
 }
+
+export function TooltipProvider({ children }) {
+  // This is a simple wrapper that allows for future context if needed
+  return <>{children}</>
+}
