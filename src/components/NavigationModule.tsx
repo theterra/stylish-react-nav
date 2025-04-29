@@ -247,6 +247,10 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
   const timeoutRef = useRef<number | null>(null);
   const mouseLeaveTimeoutRef = useRef<number | null>(null);
   const isMobile = useIsMobile();
+  
+  // Create a list of menu keys that have dropdown data
+  // This will be used to determine if we should show the dropdown
+  const dropdownMenuKeys = ['Store', 'Mac', 'iPad', 'iPhone'];
 
   const handleMenuMouseEnter = (key: string) => {
     // Clear any existing timers
@@ -259,13 +263,14 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
       mouseLeaveTimeoutRef.current = null;
     }
 
-    // If dropdown is not open yet, we'll open it
-    if (!isDropdownOpen) {
-      setDropdownMenuKey(key);
+    // Set the current menu key
+    setDropdownMenuKey(key);
+    
+    // Only show dropdown if this menu has dropdown data
+    if (dropdownMenuKeys.includes(key)) {
       setIsDropdownOpen(true);
     } else {
-      // If it's already open, just change the content without closing/reopening
-      setDropdownMenuKey(key);
+      setIsDropdownOpen(false);
     }
   };
 
@@ -312,6 +317,11 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
   const handleMobileNavClick = (menuKey: string) => {
     setActiveMobileMenu(menuKey);
   };
+
+  // Debug dropdown state
+  console.log("Current dropdown key:", dropdownMenuKey);
+  console.log("Is dropdown open:", isDropdownOpen);
+  console.log("Is menu key valid:", dropdownMenuKey ? dropdownMenuKeys.includes(dropdownMenuKey) : false);
 
   return (
     <div 

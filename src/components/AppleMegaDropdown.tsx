@@ -378,18 +378,22 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
     }
   };
 
-  // Get current menu data - don't return null during animation
-  const dropdown = activeMenuKey ? DummyDropdownData[activeMenuKey] : null;
+  // Get current menu data
+  const dropdown = activeMenuKey && DummyDropdownData[activeMenuKey] ? DummyDropdownData[activeMenuKey] : null;
+
+  // Check if this menu key has data before showing dropdown
+  const shouldDisplayDropdown = visible && dropdown !== null;
 
   // Debug the current state
   console.log("Dropdown visible:", visible);
   console.log("Active menu key:", activeMenuKey);
   console.log("Current dropdown data:", dropdown);
+  console.log("Should display dropdown:", shouldDisplayDropdown);
   console.log("Has animated:", hasAnimated);
 
   return (
     <AnimatePresence mode="sync">
-      {visible && dropdown && (
+      {shouldDisplayDropdown && (
         <>
           <BackdropOverlay
             key="backdrop-overlay"
