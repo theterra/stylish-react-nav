@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
@@ -368,9 +367,6 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [visible]);
-
-  // Don't return null during animation
-  const dropdown = activeMenuKey ? DummyDropdownData[activeMenuKey] : null;
   
   // Track when animation starts
   const handleAnimationStart = () => {
@@ -378,6 +374,9 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
       setHasAnimated(true);
     }
   };
+
+  // Get current menu data - don't return null during animation
+  const dropdown = activeMenuKey ? DummyDropdownData[activeMenuKey] : null;
 
   return (
     <AnimatePresence mode="sync">
@@ -399,7 +398,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
             key="dropdown-container"
             ref={dropdownRef}
             initial={!hasAnimated ? "hidden" : false}
-            animate={!hasAnimated ? "visible" : undefined}
+            animate="visible"
             exit="hidden"
             variants={dropdownVariants}
             onMouseEnter={onMouseEnter}
@@ -410,7 +409,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
               key="content-wrapper"
               variants={!hasAnimated ? contentVariants : undefined}
               initial={!hasAnimated ? "hidden" : false}
-              animate={!hasAnimated ? "visible" : undefined}
+              animate="visible"
               exit="hidden"
             >
               <MegaMenu>
