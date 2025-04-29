@@ -276,6 +276,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
 }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [activeMenuKey, setActiveMenuKey] = useState<string | null>(null);
+  const [hasAnimated, setHasAnimated] = useState(false);
   
   // Update activeMenuKey when menuKey changes and is valid
   useEffect(() => {
@@ -283,6 +284,17 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
       setActiveMenuKey(menuKey);
     }
   }, [menuKey]);
+
+  // Reset animation state when dropdown closes
+  useEffect(() => {
+    if (!visible) {
+      // When dropdown closes, reset animation state after exit animation completes
+      const timer = setTimeout(() => {
+        setHasAnimated(false);
+      }, 300); // slightly longer than exit animation duration
+      return () => clearTimeout(timer);
+    }
+  }, [visible]);
 
   // Animation variants
   const backdropVariants = {
@@ -360,12 +372,19 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
   // Don't return null during animation
   const dropdown = activeMenuKey ? DummyDropdownData[activeMenuKey] : null;
   
+  // Track when animation starts
+  const handleAnimationStart = () => {
+    if (!hasAnimated && visible) {
+      setHasAnimated(true);
+    }
+  };
+
   return (
     <AnimatePresence mode="sync">
       {visible && dropdown && (
         <>
           <BackdropOverlay
-            key={`backdrop-${activeMenuKey}`}
+            key="backdrop-overlay"
             initial="hidden"
             animate="visible"
             exit="hidden"
@@ -377,20 +396,21 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
             }}
           />
           <DropdownContainer
-            key={`dropdown-${activeMenuKey}`}
+            key="dropdown-container"
             ref={dropdownRef}
-            initial="hidden"
-            animate="visible"
+            initial={!hasAnimated ? "hidden" : false}
+            animate={!hasAnimated ? "visible" : undefined}
             exit="hidden"
             variants={dropdownVariants}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+            onAnimationStart={handleAnimationStart}
           >
             <ContentWrapper
-              key={`content-${activeMenuKey}`}
-              variants={contentVariants}
-              initial="hidden"
-              animate="visible"
+              key="content-wrapper"
+              variants={!hasAnimated ? contentVariants : undefined}
+              initial={!hasAnimated ? "hidden" : false}
+              animate={!hasAnimated ? "visible" : undefined}
               exit="hidden"
             >
               <MegaMenu>

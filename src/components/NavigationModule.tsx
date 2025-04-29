@@ -258,16 +258,21 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
       window.clearTimeout(mouseLeaveTimeoutRef.current);
       mouseLeaveTimeoutRef.current = null;
     }
-    // Set the active dropdown
-    setDropdownMenuKey(key);
-    setIsDropdownOpen(true);
+
+    // If dropdown is not open yet, we'll open it
+    if (!isDropdownOpen) {
+      setDropdownMenuKey(key);
+      setIsDropdownOpen(true);
+    } else {
+      // If it's already open, just change the content without closing/reopening
+      setDropdownMenuKey(key);
+    }
   };
 
   const handleNavMouseLeave = () => {
     // Use a short timeout to prevent accidental closing when moving between menu items
     mouseLeaveTimeoutRef.current = window.setTimeout(() => {
       setIsDropdownOpen(false);
-      setDropdownMenuKey(null);
     }, 100);
   };
 
