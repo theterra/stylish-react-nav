@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
@@ -281,14 +280,14 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
     hidden: { 
       opacity: 0,
       transition: { 
-        duration: 0.4,
-        ease: "easeOut"
+        duration: 0.3,
+        ease: "easeInOut"
       }
     },
     visible: { 
       opacity: 1, 
       transition: { 
-        duration: 0.3, 
+        duration: 0.25, 
         ease: "easeInOut" 
       } 
     }
@@ -300,11 +299,11 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
       opacity: 0,
       transition: {
         height: { 
-          duration: 0.4, 
-          ease: [0.19, 1, 0.22, 1]
+          duration: 0.35, 
+          ease: "easeInOut"
         },
         opacity: { 
-          duration: 0.3,
+          duration: 0.25,
           ease: "easeInOut" 
         }
       }
@@ -314,13 +313,12 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
       opacity: 1,
       transition: {
         height: { 
-          duration: 0.45, 
-          ease: [0.19, 1, 0.22, 1]
+          duration: 0.4, 
+          ease: "easeOut"
         },
         opacity: { 
-          duration: 0.3, 
-          delay: 0.05,
-          ease: "easeInOut"
+          duration: 0.35, 
+          ease: "easeOut"
         }
       }
     }
@@ -331,18 +329,17 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
       opacity: 0, 
       y: -10,
       transition: { 
-        duration: 0.3, 
+        duration: 0.25, 
         ease: "easeInOut",
-        delay: 0
       }
     },
     visible: { 
       opacity: 1, 
       y: 0,
       transition: { 
-        duration: 0.33, 
-        ease: [0.4, 0, 0.2, 1],
-        delay: 0.08
+        duration: 0.3, 
+        ease: "easeOut",
+        delay: 0.05
       }
     }
   };
@@ -378,11 +375,11 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
   const dropdown = DummyDropdownData[menuKey];
   
   return (
-    <AnimatePresence mode="wait" initial={false}>
+    <AnimatePresence initial={false} mode="wait">
       {visible && (
         <>
           <BackdropOverlay
-            key="backdrop"
+            key="dropdown-backdrop"
             initial="hidden"
             animate="visible"
             exit="hidden"
@@ -395,7 +392,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
             }}
           />
           <DropdownContainer
-            key="dropdown"
+            key="dropdown-container"
             ref={dropdownRef}
             initial="hidden"
             animate="visible"
@@ -405,7 +402,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
             onMouseLeave={onMouseLeave}
           >
             <ContentWrapper
-              key="content"
+              key="dropdown-content"
               variants={contentVariants}
               initial="hidden"
               animate="visible"
@@ -413,13 +410,13 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
             >
               <MegaMenu>
                 {dropdown.sections.map((section: any, sectionIdx: number) => (
-                  <Col key={sectionIdx}>
+                  <Col key={`section-${sectionIdx}-${menuKey}`}>
                     <SectionTitle>{section.title}</SectionTitle>
                     {section.items.map((item: any, idx: number) =>
                       idx < 2 && sectionIdx === 0 ? (
-                        <SectionLink key={item.label} to={item.path}>{item.label}</SectionLink>
+                        <SectionLink key={`${item.label}-${menuKey}`} to={item.path}>{item.label}</SectionLink>
                       ) : (
-                        <RegularLink key={item.label} to={item.path}>{item.label}</RegularLink>
+                        <RegularLink key={`${item.label}-${menuKey}`} to={item.path}>{item.label}</RegularLink>
                       )
                     )}
                   </Col>
