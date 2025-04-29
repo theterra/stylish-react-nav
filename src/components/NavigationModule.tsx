@@ -11,7 +11,7 @@ type NavLink = { title: string; path: string };
 
 type NavigationModuleProps = {
   navLinks: NavLink[],
-  mobileSubmenus: Record<string, Array<{ label: string; path?: string }>}
+  mobileSubmenus: Record<string, Array<{ label: string; path?: string }>>,
 };
 
 const NavContainer = styled.nav`
