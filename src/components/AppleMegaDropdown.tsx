@@ -175,7 +175,7 @@ const DropdownContainer = styled(motion.div)`
   background: rgba(25, 25, 26, 0.95); /* Semi-transparent background */
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  color: #fff;
+  color: #ffffff;
   z-index: 1050;
   box-shadow: 0 4px 32px 0 rgba(0,0,0,0.34);
   display: flex;
@@ -242,28 +242,30 @@ const SectionTitle = styled.div`
 `;
 
 const SectionLink = styled(Link)`
-  color: #ffffff;
+  color: #ffffff !important; /* Force white color */
   font-size: 23px;
   font-weight: 700;
   line-height: 1.18;
   text-decoration: none;
   margin-bottom: 1.5px;
   transition: color 0.13s;
+  opacity: 1;
   &:hover {
-    color: #cacaca;
+    color: #cacaca !important;
     text-decoration: underline;
   }
 `;
 
 const RegularLink = styled(Link)`
-  color: #ffffff;
+  color: #ffffff !important; /* Force white color */
   font-size: 17px;
   font-weight: 500;
   text-decoration: none;
   margin-bottom: 3px;
   transition: color 0.13s;
+  opacity: 1;
   &:hover {
-    color: #c8c8c9;
+    color: #c8c8c9 !important;
     text-decoration: underline;
   }
 `;
@@ -383,6 +385,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
   console.log("Dropdown visible:", visible);
   console.log("Active menu key:", activeMenuKey);
   console.log("Current dropdown data:", dropdown);
+  console.log("Has animated:", hasAnimated);
 
   return (
     <AnimatePresence mode="sync">
@@ -410,6 +413,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
             onAnimationStart={handleAnimationStart}
+            style={{ opacity: 1 }} /* Force opacity */
           >
             <ContentWrapper
               key="content-wrapper"
@@ -417,6 +421,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
               initial={!hasAnimated ? "hidden" : false}
               animate="visible"
               exit="hidden"
+              style={{ opacity: 1 }} /* Force opacity */
             >
               <MegaMenu>
                 {dropdown.sections.map((section: any, sectionIdx: number) => (
