@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
@@ -277,8 +278,14 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
 
   // Animation variants
   const backdropVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.3 } }
+    hidden: { 
+      opacity: 0,
+      transition: { duration: 0.3, ease: "easeInOut" }
+    },
+    visible: { 
+      opacity: 1, 
+      transition: { duration: 0.3, ease: "easeInOut" } 
+    }
   };
   
   const dropdownVariants = {
@@ -290,7 +297,10 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
           duration: 0.35, 
           ease: [0.19, 1, 0.22, 1] // Custom easing for smoother animation
         },
-        opacity: { duration: 0.2 }
+        opacity: { 
+          duration: 0.25,
+          ease: "easeInOut" 
+        }
       }
     },
     visible: { 
@@ -301,7 +311,11 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
           duration: 0.45, 
           ease: [0.19, 1, 0.22, 1] // Custom easing for smoother animation
         },
-        opacity: { duration: 0.3, delay: 0.05 }
+        opacity: { 
+          duration: 0.3, 
+          delay: 0.05,
+          ease: "easeInOut"
+        }
       }
     }
   };
@@ -310,7 +324,11 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
     hidden: { 
       opacity: 0, 
       y: -10,
-      transition: { duration: 0.2, ease: [0.4, 0, 0.2, 1] }
+      transition: { 
+        duration: 0.25, 
+        ease: [0.4, 0, 0.2, 1],
+        opacity: { duration: 0.2 }
+      }
     },
     visible: { 
       opacity: 1, 
@@ -354,7 +372,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
   const dropdown = DummyDropdownData[menuKey];
   
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {visible && (
         <>
           <BackdropOverlay
