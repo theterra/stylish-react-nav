@@ -180,7 +180,7 @@ const DropdownContainer = styled(motion.div)`
   display: flex;
   justify-content: center;
   overflow: hidden;
-  padding: 42px 0 52px 0;
+  padding: 0; /* We'll add padding in the ContentWrapper */
 
   @media (max-width: 1080px) {
     max-width: 100vw;
@@ -196,6 +196,7 @@ const ContentWrapper = styled(motion.div)`
   overflow-y: visible;
   display: flex;
   justify-content: center;
+  padding: 42px 0 52px 0;
 `;
 
 const MegaMenu = styled.div`
@@ -285,7 +286,10 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
       height: 0,
       opacity: 0,
       transition: {
-        height: { duration: 0.3, ease: [0.16, 1, 0.3, 1] },
+        height: { 
+          duration: 0.35, 
+          ease: [0.19, 1, 0.22, 1] // Custom easing for smoother animation
+        },
         opacity: { duration: 0.2 }
       }
     },
@@ -293,7 +297,10 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
       height: "auto", 
       opacity: 1,
       transition: {
-        height: { duration: 0.45, ease: [0.16, 1, 0.3, 1] },
+        height: { 
+          duration: 0.45, 
+          ease: [0.19, 1, 0.22, 1] // Custom easing for smoother animation
+        },
         opacity: { duration: 0.3, delay: 0.05 }
       }
     }
