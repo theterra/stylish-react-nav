@@ -11,7 +11,7 @@ type NavLink = { title: string; path: string };
 
 type NavigationModuleProps = {
   navLinks: NavLink[],
-  mobileSubmenus: Record<string, Array<{ label: string; path?: string }>>
+  mobileSubmenus: Record<string, Array<{ label: string; path?: string }>}
 };
 
 const NavContainer = styled.nav`
@@ -268,6 +268,19 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
       setDropdownMenuKey(null);
     }
   };
+
+  // Listen for the custom close event
+  useEffect(() => {
+    const handleCloseDropdown = () => {
+      setIsDropdownOpen(false);
+      setDropdownMenuKey(null);
+    };
+    
+    document.addEventListener('close-mega-dropdown', handleCloseDropdown);
+    return () => {
+      document.removeEventListener('close-mega-dropdown', handleCloseDropdown);
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

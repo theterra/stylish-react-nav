@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
@@ -155,11 +156,11 @@ const BackdropOverlay = styled.div<{ $visible: boolean }>`
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, ${({ $visible }) => ($visible ? "0.2" : "0")});
-  backdrop-filter: ${({ $visible }) => ($visible ? "blur(5px)" : "blur(0px)")};
-  -webkit-backdrop-filter: ${({ $visible }) => ($visible ? "blur(5px)" : "blur(0px)")};
+  backdrop-filter: ${({ $visible }) => ($visible ? "blur(5px)" : "none")};
+  -webkit-backdrop-filter: ${({ $visible }) => ($visible ? "blur(5px)" : "none")};
   pointer-events: ${({ $visible }) => ($visible ? "auto" : "none")};
   opacity: ${({ $visible }) => ($visible ? 1 : 0)};
-  transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+  transition: opacity 0.3s ease, backdrop-filter 0.3s ease, -webkit-backdrop-filter 0.3s ease;
   z-index: 900;
 `;
 
@@ -182,7 +183,8 @@ const DropdownAnim = styled.div<{ $visible: boolean }>`
   /* Height transition */
   max-height: ${({ $visible }) => ($visible ? "550px" : "0")};
   transition: max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1), 
-              backdrop-filter 0.3s ease;
+              backdrop-filter 0.3s ease,
+              -webkit-backdrop-filter 0.3s ease;
   visibility: ${({ $visible }) => ($visible ? "visible" : "hidden")};
   padding: ${({ $visible }) => ($visible ? "42px 0 52px 0" : "0")};
 
@@ -280,6 +282,7 @@ export const AppleMegaDropdown: React.FC<{ menuKey: string | null, visible: bool
 }) => {
   // Unmount content after close for accessibility and layout
   const [shouldRender, setShouldRender] = useState(visible);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (visible) setShouldRender(true);
@@ -301,6 +304,20 @@ export const AppleMegaDropdown: React.FC<{ menuKey: string | null, visible: bool
     };
   }, [visible]);
 
+  // Handle click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node) && visible) {
+        // Close the dropdown by dispatching a custom event
+        const closeEvent = new CustomEvent('close-mega-dropdown');
+        document.dispatchEvent(closeEvent);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [visible]);
+
   if (!menuKey || !(menuKey in DummyDropdownData)) return (
     <>
       <BackdropOverlay $visible={false} aria-hidden="true" />
@@ -311,8 +328,22 @@ export const AppleMegaDropdown: React.FC<{ menuKey: string | null, visible: bool
   const dropdown = DummyDropdownData[menuKey];
   return (
     <>
-      <BackdropOverlay $visible={visible} aria-hidden={!visible ? "true" : "false"} />
-      <DropdownAnim $visible={visible} aria-hidden={!visible ? "true" : "false"}>
+      <BackdropOverlay 
+        $visible={visible} 
+        aria-hidden={!visible ? "true" : "false"} 
+        onClick={(e) => {
+          // Prevent the click from propagating to elements below
+          e.stopPropagation();
+          // Dispatch close event
+          const closeEvent = new CustomEvent('close-mega-dropdown');
+          document.dispatchEvent(closeEvent);
+        }} 
+      />
+      <DropdownAnim 
+        $visible={visible} 
+        aria-hidden={!visible ? "true" : "false"}
+        ref={dropdownRef}
+      >
         {shouldRender &&
           <ContentWrapper $visible={visible}>
             <MegaMenu>
