@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
@@ -299,11 +300,11 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
       opacity: 0,
       transition: {
         height: { 
-          duration: 0.5, 
+          duration: 0.4, 
           ease: [0.19, 1, 0.22, 1]
         },
         opacity: { 
-          duration: 0.2,
+          duration: 0.3,
           ease: "easeInOut" 
         }
       }
@@ -330,8 +331,9 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
       opacity: 0, 
       y: -10,
       transition: { 
-        duration: 0.25, 
-        ease: "easeInOut"
+        duration: 0.3, 
+        ease: "easeInOut",
+        delay: 0
       }
     },
     visible: { 
@@ -376,7 +378,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
   const dropdown = DummyDropdownData[menuKey];
   
   return (
-    <AnimatePresence mode="sync">
+    <AnimatePresence mode="wait" initial={false}>
       {visible && (
         <>
           <BackdropOverlay
