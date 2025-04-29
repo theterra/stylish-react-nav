@@ -275,21 +275,16 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
 }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Animation variants
+  // Completely rewritten animation variants
   const backdropVariants = {
     hidden: { 
       opacity: 0,
-      transition: { 
-        duration: 0.3,
-        ease: "easeInOut"
-      }
     },
     visible: { 
-      opacity: 1, 
-      transition: { 
-        duration: 0.25, 
-        ease: "easeInOut" 
-      } 
+      opacity: 1,
+      transition: {
+        duration: 0.2
+      }
     }
   };
   
@@ -297,28 +292,16 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
     hidden: { 
       height: 0,
       opacity: 0,
-      transition: {
-        height: { 
-          duration: 0.35, 
-          ease: "easeInOut"
-        },
-        opacity: { 
-          duration: 0.25,
-          ease: "easeInOut" 
-        }
-      }
     },
     visible: { 
       height: "auto", 
       opacity: 1,
       transition: {
         height: { 
-          duration: 0.4, 
-          ease: "easeOut"
+          duration: 0.3, 
         },
         opacity: { 
-          duration: 0.35, 
-          ease: "easeOut"
+          duration: 0.2, 
         }
       }
     }
@@ -328,17 +311,12 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
     hidden: { 
       opacity: 0, 
       y: -10,
-      transition: { 
-        duration: 0.25, 
-        ease: "easeInOut",
-      }
     },
     visible: { 
       opacity: 1, 
       y: 0,
       transition: { 
-        duration: 0.3, 
-        ease: "easeOut",
+        duration: 0.25,
         delay: 0.05
       }
     }
@@ -375,16 +353,15 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
   const dropdown = DummyDropdownData[menuKey];
   
   return (
-    <AnimatePresence initial={false} mode="wait">
+    <AnimatePresence mode="sync">
       {visible && (
         <>
           <BackdropOverlay
-            key="dropdown-backdrop"
+            key={`backdrop-${menuKey}`}
             initial="hidden"
             animate="visible"
             exit="hidden"
             variants={backdropVariants}
-            aria-hidden={!visible ? "true" : "false"}
             onClick={(e) => {
               e.stopPropagation();
               const closeEvent = new CustomEvent('close-mega-dropdown');
@@ -392,7 +369,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
             }}
           />
           <DropdownContainer
-            key="dropdown-container"
+            key={`dropdown-${menuKey}`}
             ref={dropdownRef}
             initial="hidden"
             animate="visible"
@@ -402,7 +379,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
             onMouseLeave={onMouseLeave}
           >
             <ContentWrapper
-              key="dropdown-content"
+              key={`content-${menuKey}`}
               variants={contentVariants}
               initial="hidden"
               animate="visible"
@@ -414,9 +391,9 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
                     <SectionTitle>{section.title}</SectionTitle>
                     {section.items.map((item: any, idx: number) =>
                       idx < 2 && sectionIdx === 0 ? (
-                        <SectionLink key={`${item.label}-${menuKey}`} to={item.path}>{item.label}</SectionLink>
+                        <SectionLink key={`${item.label}-${menuKey}-${idx}`} to={item.path}>{item.label}</SectionLink>
                       ) : (
-                        <RegularLink key={`${item.label}-${menuKey}`} to={item.path}>{item.label}</RegularLink>
+                        <RegularLink key={`${item.label}-${menuKey}-${idx}`} to={item.path}>{item.label}</RegularLink>
                       )
                     )}
                   </Col>
