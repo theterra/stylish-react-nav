@@ -280,11 +280,17 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
   const backdropVariants = {
     hidden: { 
       opacity: 0,
-      transition: { duration: 0.3, ease: "easeInOut" }
+      transition: { 
+        duration: 0.3, 
+        ease: "easeInOut" 
+      }
     },
     visible: { 
       opacity: 1, 
-      transition: { duration: 0.3, ease: "easeInOut" } 
+      transition: { 
+        duration: 0.3, 
+        ease: "easeInOut" 
+      } 
     }
   };
   
@@ -294,11 +300,11 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
       opacity: 0,
       transition: {
         height: { 
-          duration: 0.35, 
+          duration: 0.45, // Increased duration for closing
           ease: [0.19, 1, 0.22, 1] // Custom easing for smoother animation
         },
         opacity: { 
-          duration: 0.25,
+          duration: 0.45, // Match height duration for closing
           ease: "easeInOut" 
         }
       }
@@ -325,9 +331,15 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
       opacity: 0, 
       y: -10,
       transition: { 
-        duration: 0.25, 
+        duration: 0.3, // Increased for smoother exit
         ease: [0.4, 0, 0.2, 1],
-        opacity: { duration: 0.2 }
+        opacity: { 
+          duration: 0.25 
+        },
+        y: {
+          duration: 0.3
+        },
+        when: "afterChildren" // Wait for children to animate out first
       }
     },
     visible: { 
@@ -400,6 +412,9 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
           >
             <ContentWrapper
               variants={contentVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
             >
               <MegaMenu>
                 {dropdown.sections.map((section: any, sectionIdx: number) => (
