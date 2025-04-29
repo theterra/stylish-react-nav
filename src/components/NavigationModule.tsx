@@ -249,6 +249,7 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
   const isMobile = useIsMobile();
 
   const handleMenuMouseEnter = (key: string) => {
+    // Clear any existing timers
     if (timeoutRef.current !== null) {
       window.clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
@@ -257,16 +258,17 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
       window.clearTimeout(mouseLeaveTimeoutRef.current);
       mouseLeaveTimeoutRef.current = null;
     }
+    // Set the active dropdown
     setDropdownMenuKey(key);
     setIsDropdownOpen(true);
   };
 
-  const handleNavMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-    const navRect = navRef.current?.getBoundingClientRect();
-    if (navRect && (e.clientX < navRect.left || e.clientX > navRect.right || e.clientY < navRect.top || e.clientY > navRect.bottom)) {
+  const handleNavMouseLeave = () => {
+    // Use a short timeout to prevent accidental closing when moving between menu items
+    mouseLeaveTimeoutRef.current = window.setTimeout(() => {
       setIsDropdownOpen(false);
       setDropdownMenuKey(null);
-    }
+    }, 100);
   };
 
   // Listen for the custom close event
@@ -282,16 +284,7 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
     };
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
+  // Clean up timers on unmount
   useEffect(() => {
     return () => {
       if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
@@ -299,6 +292,7 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
     };
   }, []);
 
+  // Handle body scroll lock for mobile menu
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -315,7 +309,11 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
   };
 
   return (
-    <div ref={navRef} style={{ width: '100%' }} onMouseLeave={handleNavMouseLeave}>
+    <div 
+      ref={navRef} 
+      style={{ width: '100%' }} 
+      onMouseLeave={handleNavMouseLeave}
+    >
       {/* Mobile header - Only visible on mobile */}
       <MobileHeader>
         <LogoLink to="/">
@@ -404,7 +402,17 @@ const NavigationModule: React.FC<NavigationModuleProps> = ({
         </NavContent>
       </NavContainer>
 
-      <AppleMegaDropdown visible={isDropdownOpen} menuKey={dropdownMenuKey} />
+      <AppleMegaDropdown 
+        visible={isDropdownOpen} 
+        menuKey={dropdownMenuKey} 
+        onMouseEnter={() => {
+          if (mouseLeaveTimeoutRef.current !== null) {
+            window.clearTimeout(mouseLeaveTimeoutRef.current);
+            mouseLeaveTimeoutRef.current = null;
+          }
+        }}
+        onMouseLeave={handleNavMouseLeave}
+      />
     </div>
   );
 };

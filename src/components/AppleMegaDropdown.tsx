@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
@@ -6,6 +5,8 @@ import { Link } from "react-router-dom";
 interface AppleMegaDropdownProps {
   menuKey: string | null;
   visible: boolean;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 const DummyDropdownData: Record<string, any> = {
@@ -276,9 +277,11 @@ const RegularLink = styled(Link)`
   }
 `;
 
-export const AppleMegaDropdown: React.FC<{ menuKey: string | null, visible: boolean }> = ({
+export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
   menuKey,
   visible,
+  onMouseEnter,
+  onMouseLeave
 }) => {
   // Unmount content after close for accessibility and layout
   const [shouldRender, setShouldRender] = useState(visible);
@@ -343,6 +346,8 @@ export const AppleMegaDropdown: React.FC<{ menuKey: string | null, visible: bool
         $visible={visible} 
         aria-hidden={!visible ? "true" : "false"}
         ref={dropdownRef}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       >
         {shouldRender &&
           <ContentWrapper $visible={visible}>
