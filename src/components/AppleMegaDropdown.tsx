@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
@@ -241,7 +242,7 @@ const SectionTitle = styled.div`
 `;
 
 const SectionLink = styled(Link)`
-  color: #fff;
+  color: #ffffff;
   font-size: 23px;
   font-weight: 700;
   line-height: 1.18;
@@ -255,7 +256,7 @@ const SectionLink = styled(Link)`
 `;
 
 const RegularLink = styled(Link)`
-  color: #fff;
+  color: #ffffff;
   font-size: 17px;
   font-weight: 500;
   text-decoration: none;
@@ -378,6 +379,11 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
   // Get current menu data - don't return null during animation
   const dropdown = activeMenuKey ? DummyDropdownData[activeMenuKey] : null;
 
+  // Debug the current state
+  console.log("Dropdown visible:", visible);
+  console.log("Active menu key:", activeMenuKey);
+  console.log("Current dropdown data:", dropdown);
+
   return (
     <AnimatePresence mode="sync">
       {visible && dropdown && (
@@ -416,13 +422,13 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
                 {dropdown.sections.map((section: any, sectionIdx: number) => (
                   <Col key={`section-${sectionIdx}-${activeMenuKey}`}>
                     <SectionTitle>{section.title}</SectionTitle>
-                    {section.items.map((item: any, idx: number) =>
+                    {section.items.map((item: any, idx: number) => (
                       idx < 2 && sectionIdx === 0 ? (
                         <SectionLink key={`${item.label}-${activeMenuKey}-${idx}`} to={item.path}>{item.label}</SectionLink>
                       ) : (
                         <RegularLink key={`${item.label}-${activeMenuKey}-${idx}`} to={item.path}>{item.label}</RegularLink>
                       )
-                    )}
+                    ))}
                   </Col>
                 ))}
               </MegaMenu>
