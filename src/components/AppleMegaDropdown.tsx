@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
@@ -274,8 +275,16 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
   onMouseLeave
 }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [activeMenuKey, setActiveMenuKey] = useState<string | null>(null);
+  
+  // Update activeMenuKey when menuKey changes and is valid
+  useEffect(() => {
+    if (menuKey && menuKey in DummyDropdownData) {
+      setActiveMenuKey(menuKey);
+    }
+  }, [menuKey]);
 
-  // Completely rewritten animation variants
+  // Animation variants
   const backdropVariants = {
     hidden: { 
       opacity: 0,
@@ -348,16 +357,15 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [visible]);
 
-  if (!menuKey || !(menuKey in DummyDropdownData)) return null;
-
-  const dropdown = DummyDropdownData[menuKey];
+  // Don't return null during animation
+  const dropdown = activeMenuKey ? DummyDropdownData[activeMenuKey] : null;
   
   return (
     <AnimatePresence mode="sync">
-      {visible && (
+      {visible && dropdown && (
         <>
           <BackdropOverlay
-            key={`backdrop-${menuKey}`}
+            key={`backdrop-${activeMenuKey}`}
             initial="hidden"
             animate="visible"
             exit="hidden"
@@ -369,7 +377,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
             }}
           />
           <DropdownContainer
-            key={`dropdown-${menuKey}`}
+            key={`dropdown-${activeMenuKey}`}
             ref={dropdownRef}
             initial="hidden"
             animate="visible"
@@ -379,7 +387,7 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
             onMouseLeave={onMouseLeave}
           >
             <ContentWrapper
-              key={`content-${menuKey}`}
+              key={`content-${activeMenuKey}`}
               variants={contentVariants}
               initial="hidden"
               animate="visible"
@@ -387,13 +395,13 @@ export const AppleMegaDropdown: React.FC<AppleMegaDropdownProps> = ({
             >
               <MegaMenu>
                 {dropdown.sections.map((section: any, sectionIdx: number) => (
-                  <Col key={`section-${sectionIdx}-${menuKey}`}>
+                  <Col key={`section-${sectionIdx}-${activeMenuKey}`}>
                     <SectionTitle>{section.title}</SectionTitle>
                     {section.items.map((item: any, idx: number) =>
                       idx < 2 && sectionIdx === 0 ? (
-                        <SectionLink key={`${item.label}-${menuKey}-${idx}`} to={item.path}>{item.label}</SectionLink>
+                        <SectionLink key={`${item.label}-${activeMenuKey}-${idx}`} to={item.path}>{item.label}</SectionLink>
                       ) : (
-                        <RegularLink key={`${item.label}-${menuKey}-${idx}`} to={item.path}>{item.label}</RegularLink>
+                        <RegularLink key={`${item.label}-${activeMenuKey}-${idx}`} to={item.path}>{item.label}</RegularLink>
                       )
                     )}
                   </Col>
