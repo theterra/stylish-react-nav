@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Search, ShoppingBag, Menu, X } from 'lucide-react';
@@ -102,6 +101,25 @@ const NavLinkStyled = styled(Link)`
   font-size: 12px;
   font-weight: 400;
   font-family: "SF Pro Text", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  position: relative;
+  
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #f5f5f7;
+    opacity: 0;
+    transform: scaleX(0);
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  
+  &:hover:after {
+    opacity: 0.8;
+    transform: scaleX(1);
+  }
 `;
 
 const IconContainer = styled.div`

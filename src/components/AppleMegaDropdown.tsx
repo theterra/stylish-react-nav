@@ -158,7 +158,9 @@ const DropdownAnim = styled.div<{ $visible: boolean }>`
   top: 44px;
   width: 100vw;
   max-width: 100vw;
-  background: #19191a;
+  background: rgba(25, 25, 26, 0.95); /* Semi-transparent background */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: #fff;
   z-index: 1050;
   box-shadow: 0 4px 32px 0 rgba(0,0,0,0.34);
@@ -167,7 +169,8 @@ const DropdownAnim = styled.div<{ $visible: boolean }>`
   overflow: hidden;
   /* Height transition */
   max-height: ${({ $visible }) => ($visible ? "550px" : "0")};
-  transition: max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1), 
+              backdrop-filter 0.3s ease;
   visibility: ${({ $visible }) => ($visible ? "visible" : "hidden")};
   padding: ${({ $visible }) => ($visible ? "42px 0 52px 0" : "0")};
 
