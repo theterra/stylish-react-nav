@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
@@ -151,6 +150,19 @@ const DummyDropdownData: Record<string, any> = {
   },
 };
 
+// Backdrop overlay that will blur the background content
+const BackdropOverlay = styled.div<{ $visible: boolean }>`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, ${({ $visible }) => ($visible ? "0.2" : "0")});
+  backdrop-filter: ${({ $visible }) => ($visible ? "blur(5px)" : "blur(0px)")};
+  -webkit-backdrop-filter: ${({ $visible }) => ($visible ? "blur(5px)" : "blur(0px)")};
+  pointer-events: ${({ $visible }) => ($visible ? "auto" : "none")};
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+  z-index: 900;
+`;
+
 // Animation: collapse height, fade content for smooth open/close
 const DropdownAnim = styled.div<{ $visible: boolean }>`
   position: fixed;
@@ -277,32 +289,50 @@ export const AppleMegaDropdown: React.FC<{ menuKey: string | null, visible: bool
     }
   }, [visible]);
 
+  // Add body scroll lock when dropdown is open
+  useEffect(() => {
+    if (visible) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [visible]);
+
   if (!menuKey || !(menuKey in DummyDropdownData)) return (
-    <DropdownAnim $visible={false} aria-hidden="true" />
+    <>
+      <BackdropOverlay $visible={false} aria-hidden="true" />
+      <DropdownAnim $visible={false} aria-hidden="true" />
+    </>
   );
 
   const dropdown = DummyDropdownData[menuKey];
   return (
-    <DropdownAnim $visible={visible} aria-hidden={!visible ? "true" : "false"}>
-      {shouldRender &&
-        <ContentWrapper $visible={visible}>
-          <MegaMenu>
-            {dropdown.sections.map((section: any, sectionIdx: number) => (
-              <Col key={sectionIdx}>
-                <SectionTitle>{section.title}</SectionTitle>
-                {section.items.map((item: any, idx: number) =>
-                  idx < 2 && sectionIdx === 0 ? (
-                    <SectionLink key={item.label} to={item.path}>{item.label}</SectionLink>
-                  ) : (
-                    <RegularLink key={item.label} to={item.path}>{item.label}</RegularLink>
-                  )
-                )}
-              </Col>
-            ))}
-          </MegaMenu>
-        </ContentWrapper>
-      }
-    </DropdownAnim>
+    <>
+      <BackdropOverlay $visible={visible} aria-hidden={!visible ? "true" : "false"} />
+      <DropdownAnim $visible={visible} aria-hidden={!visible ? "true" : "false"}>
+        {shouldRender &&
+          <ContentWrapper $visible={visible}>
+            <MegaMenu>
+              {dropdown.sections.map((section: any, sectionIdx: number) => (
+                <Col key={sectionIdx}>
+                  <SectionTitle>{section.title}</SectionTitle>
+                  {section.items.map((item: any, idx: number) =>
+                    idx < 2 && sectionIdx === 0 ? (
+                      <SectionLink key={item.label} to={item.path}>{item.label}</SectionLink>
+                    ) : (
+                      <RegularLink key={item.label} to={item.path}>{item.label}</RegularLink>
+                    )
+                  )}
+                </Col>
+              ))}
+            </MegaMenu>
+          </ContentWrapper>
+        }
+      </DropdownAnim>
+    </>
   );
 };
 
